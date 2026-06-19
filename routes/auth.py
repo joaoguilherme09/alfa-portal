@@ -8,93 +8,43 @@ def login_aluno():
         matricula = request.form.get('matricula')
         senha = request.form.get('senha')
 
-        # --- Autenticação provisória (até o banco estar pronto) ---
-        # Depois você vai buscar o aluno no banco aqui
-        if matricula == '12345' and senha == '123':
-            session['usuario'] = matricula
-            session['perfil'] = 'aluno'
-            flash('Login realizado com sucesso!', 'success')
-            return redirect(url_for('auth.login_aluno'))  # trocar para home do aluno depois
-        else:
-            flash('Matrícula ou senha incorretos.', 'error')
-            return redirect(url_for('auth.login_aluno'))
-
-    return render_template('auth/login_aluno.html')
-
-
-@auth_bp.route('/login/professor', methods=['GET', 'POST'])
-def login_professor():
-    if request.method == 'POST':
-        matricula = request.form.get('matricula')
-        senha = request.form.get('senha')
-
-        # --- Autenticação provisória (até o banco estar pronto) ---
-        # Depois você vai buscar o professor no banco aqui
-        if matricula == 'prof01' and senha == '123':
-            session['usuario'] = matricula
-            session['perfil'] = 'professor'
-            flash('Login realizado com sucesso!', 'success')
-            return redirect(url_for('auth.login_professor'))  # trocar para home do professor depois
-        else:
-            flash('Matrícula ou senha incorretos.', 'error')
-            return redirect(url_for('auth.login_professor'))
-
-    return render_template('auth/login_professor.html')
-
-
-@auth_bp.route('/logout')
-def logout():
-    session.clear()
-    return redirect(url_for('inicial'))
-
-
-
-@auth_bp.route('/login/aluno', methods=['GET', 'POST'])
-def login_aluno():
-    if request.method == 'POST':
-        matricula = request.form.get('matricula')
-        senha = request.form.get('senha')
- 
-        # --- Autenticação provisória (até o banco estar pronto) ---
         if matricula == '12345' and senha == '123':
             session['perfil'] = 'aluno'
             session['usuario'] = matricula
             session['matricula'] = matricula
-            session['nome'] = 'João Guilherme P. Mendes'  # provisório — virá do banco
-            session['curso'] = 'Informática'              # provisório
-            session['periodo'] = 'Manhã'                  # provisório
-            session['foto'] = None                        # provisório
+            session['nome'] = 'João Guilherme P. Mendes'
+            session['curso'] = 'Informática'
+            session['periodo'] = 'Manhã'
+            session['foto'] = None
             return redirect(url_for('aluno.home'))
         else:
             flash('Matrícula ou senha incorretos.', 'error')
             return redirect(url_for('auth.login_aluno'))
- 
+
     return render_template('auth/login_aluno.html')
- 
- 
+
+
 @auth_bp.route('/login/professor', methods=['GET', 'POST'])
 def login_professor():
     if request.method == 'POST':
         matricula = request.form.get('matricula')
         senha = request.form.get('senha')
- 
-        # --- Autenticação provisória (até o banco estar pronto) ---
+
         if matricula == 'prof01' and senha == '123':
             session['perfil'] = 'professor'
             session['usuario'] = matricula
             session['matricula'] = matricula
-            session['nome'] = 'Professor'                 # provisório — virá do banco
-            session['foto'] = None                        # provisório
-            return redirect(url_for('auth.login_professor'))  # trocar para home do professor depois
+            session['nome'] = 'Professor'
+            session['foto'] = None
+            return redirect(url_for('auth.login_professor'))
         else:
             flash('Matrícula ou senha incorretos.', 'error')
             return redirect(url_for('auth.login_professor'))
- 
+
     return render_template('auth/login_professor.html')
- 
- 
+
+
 @auth_bp.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('inicial'))
- 
