@@ -1,0 +1,28 @@
+{% extends "aluno/base_aluno.html" %}
+
+{% block titulo %}Home{% endblock %}
+{% block pagina_titulo %}Home{% endblock %}
+
+{% block estilo %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+{% endblock %}
+
+{% block conteudo %}
+
+<div class="home-wrapper">
+
+  <!-- Banner principal -->
+  <div class="banner-home">
+    <img
+      src="{{ url_for('static', filename='img/8D9F42CA-3EF2-48C3-875D-FF9E3689F5D1.png') }}"
+      alt="Alfa Profissionalizantes"
+      class="banner-imagem"
+    />
+    <div class="banner-overlay">
+      <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Alfa" class="banner-logo"/>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

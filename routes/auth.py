@@ -46,3 +46,55 @@ def login_professor():
 def logout():
     session.clear()
     return redirect(url_for('inicial'))
+
+
+
+@auth_bp.route('/login/aluno', methods=['GET', 'POST'])
+def login_aluno():
+    if request.method == 'POST':
+        matricula = request.form.get('matricula')
+        senha = request.form.get('senha')
+ 
+        # --- Autenticação provisória (até o banco estar pronto) ---
+        if matricula == '12345' and senha == '123':
+            session['perfil'] = 'aluno'
+            session['usuario'] = matricula
+            session['matricula'] = matricula
+            session['nome'] = 'João Guilherme P. Mendes'  # provisório — virá do banco
+            session['curso'] = 'Informática'              # provisório
+            session['periodo'] = 'Manhã'                  # provisório
+            session['foto'] = None                        # provisório
+            return redirect(url_for('aluno.home'))
+        else:
+            flash('Matrícula ou senha incorretos.', 'error')
+            return redirect(url_for('auth.login_aluno'))
+ 
+    return render_template('auth/login_aluno.html')
+ 
+ 
+@auth_bp.route('/login/professor', methods=['GET', 'POST'])
+def login_professor():
+    if request.method == 'POST':
+        matricula = request.form.get('matricula')
+        senha = request.form.get('senha')
+ 
+        # --- Autenticação provisória (até o banco estar pronto) ---
+        if matricula == 'prof01' and senha == '123':
+            session['perfil'] = 'professor'
+            session['usuario'] = matricula
+            session['matricula'] = matricula
+            session['nome'] = 'Professor'                 # provisório — virá do banco
+            session['foto'] = None                        # provisório
+            return redirect(url_for('auth.login_professor'))  # trocar para home do professor depois
+        else:
+            flash('Matrícula ou senha incorretos.', 'error')
+            return redirect(url_for('auth.login_professor'))
+ 
+    return render_template('auth/login_professor.html')
+ 
+ 
+@auth_bp.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('inicial'))
+ 
