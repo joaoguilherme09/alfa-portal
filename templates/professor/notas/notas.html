@@ -1,0 +1,119 @@
+{% extends "professor/base_professor.html" %}
+
+{% block titulo %}Notas{% endblock %}
+{% block pagina_titulo %}Notas{% endblock %}
+
+{% block estilo %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/notas.css') }}">
+{% endblock %}
+
+{% block conteudo %}
+
+<div class="notas-prof-wrapper">
+
+  <div class="notas-prof-card">
+
+    <div class="notas-prof-header">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="28" height="28">
+        <path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm-7 3a3 3 0 1 1 0 6 3 3 0 0 1 0-6zm6 12H6v-.5c0-2 4-3.1 6-3.1s6 1.1 6 3.1V18z"/>
+      </svg>
+      <div>
+        <h2 class="notas-prof-titulo">Lançar Nota</h2>
+        <p class="notas-prof-subtitulo">Selecione o aluno e preencha os dados da atividade</p>
+      </div>
+    </div>
+
+    <div class="notas-prof-secao-label">Selecionar aluno</div>
+
+    <div class="campo-grupo">
+      <label class="campo-label">Curso</label>
+      <select class="campo-select" id="select-curso" onchange="atualizarTurmas()">
+        <option value="">Selecione o curso</option>
+        <option>Informática</option>
+        <option>Inglês</option>
+        <option>ENEM</option>
+        <option>Embraer</option>
+        <option>Reforço</option>
+        <option>Alfabetização</option>
+      </select>
+    </div>
+
+    <div class="campo-grupo">
+      <label class="campo-label">Turma</label>
+      <select class="campo-select" id="select-turma" disabled onchange="atualizarAlunos()">
+        <option value="">Selecione a turma</option>
+        <option>Segunda e Quarta 19h às 20h</option>
+        <option>Terça e Quinta 14h às 16h</option>
+        <option>Sábado 09h às 11h</option>
+      </select>
+    </div>
+
+    <div class="campo-grupo">
+      <label class="campo-label">Aluno</label>
+      <select class="campo-select" id="select-aluno" disabled>
+        <option value="">Selecione o aluno</option>
+        <option>João Guilherme P. Mendes</option>
+        <option>Maria Clara Silva</option>
+        <option>Pedro Henrique Souza</option>
+        <option>Lucas Oliveira</option>
+      </select>
+    </div>
+
+    <div class="notas-prof-divisor"></div>
+
+    <div class="notas-prof-secao-label">Dados da atividade</div>
+
+    <div class="campo-grupo">
+      <label class="campo-label">Nome da atividade</label>
+      <input type="text" class="campo-input" placeholder="Ex: Atividade 2"/>
+    </div>
+
+    <div class="notas-prof-linha">
+      <div class="campo-grupo">
+        <label class="campo-label">Mês relacionado</label>
+        <select class="campo-select">
+          <option value="">Selecione o mês</option>
+          <option>Janeiro</option><option>Fevereiro</option><option>Março</option>
+          <option>Abril</option><option>Maio</option><option>Junho</option>
+          <option>Julho</option><option>Agosto</option><option>Setembro</option>
+          <option>Outubro</option><option>Novembro</option><option>Dezembro</option>
+        </select>
+      </div>
+      <div class="campo-grupo campo-nota">
+        <label class="campo-label">Nota</label>
+        <input type="number" class="campo-input campo-input-nota" placeholder="0.0" min="0" max="10" step="0.1"/>
+      </div>
+    </div>
+
+    <button class="btn-salvar-nota-prof">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+        <path d="M17 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7l-4-4zm-5 16a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm3-10H5V5h10v4z"/>
+      </svg>
+      Salvar Nota
+    </button>
+
+  </div>
+
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script>
+function atualizarTurmas() {
+  const curso = document.getElementById('select-curso').value;
+  const turma = document.getElementById('select-turma');
+  const aluno = document.getElementById('select-aluno');
+  turma.disabled = !curso;
+  aluno.disabled = true;
+  aluno.value = '';
+  turma.value = '';
+}
+function atualizarAlunos() {
+  const turma = document.getElementById('select-turma').value;
+  const aluno = document.getElementById('select-aluno');
+  aluno.disabled = !turma;
+  aluno.value = '';
+}
+</script>
+{% endblock %}

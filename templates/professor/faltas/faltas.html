@@ -1,0 +1,179 @@
+{% extends "professor/base_professor.html" %}
+
+{% block titulo %}Faltas{% endblock %}
+{% block pagina_titulo %}Faltas{% endblock %}
+
+{% block estilo %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/faltas.css') }}">
+{% endblock %}
+
+{% block conteudo %}
+
+<div class="faltas-prof-wrapper">
+
+  <!-- Card de seleção -->
+  <div class="faltas-prof-card" id="card-selecao">
+
+    <div class="notas-prof-header">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="28" height="28">
+        <path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1h-2zm3 18H5V8h14v11z"/>
+      </svg>
+      <div>
+        <h2 class="notas-prof-titulo">Fazer Chamada</h2>
+        <p class="notas-prof-subtitulo">Selecione o curso e a turma para iniciar</p>
+      </div>
+    </div>
+
+    <div class="notas-prof-secao-label">Selecionar turma</div>
+
+    <div class="campo-grupo">
+      <label class="campo-label">Curso</label>
+      <select class="campo-select" id="select-curso-falta" onchange="habilitarTurma()">
+        <option value="">Selecione o curso</option>
+        <option>Informática</option>
+        <option>Inglês</option>
+        <option>ENEM</option>
+        <option>Embraer</option>
+        <option>Reforço</option>
+        <option>Alfabetização</option>
+      </select>
+    </div>
+
+    <div class="campo-grupo">
+      <label class="campo-label">Turma</label>
+      <select class="campo-select" id="select-turma-falta" disabled>
+        <option value="">Selecione a turma</option>
+        <option>Segunda e Quarta 19h às 20h</option>
+        <option>Terça e Quinta 14h às 16h</option>
+        <option>Sábado 09h às 11h</option>
+      </select>
+    </div>
+
+    <button class="btn-salvar-nota-prof" onclick="abrirChamada()">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+        <path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1h-2zm3 18H5V8h14v11z"/>
+      </svg>
+      Abrir Chamada
+    </button>
+
+  </div>
+
+  <!-- Card de chamada -->
+  <div class="faltas-prof-card oculto" id="card-chamada">
+
+    <div class="chamada-header">
+      <div>
+        <h3 class="chamada-titulo">Chamada do dia</h3>
+        <p class="chamada-data" id="chamada-data"></p>
+      </div>
+      <span class="chamada-turma-label" id="chamada-turma-label"></span>
+    </div>
+
+    <p class="chamada-instrucao">Todos começam como ✅ Presente. Clique para marcar falta.</p>
+
+    <div class="lista-alunos-chamada">
+      {% set alunos = [
+        ('João Guilherme P. Mendes', '50240371', 1),
+        ('Maria Clara Silva',        '50240372', 0),
+        ('Pedro Henrique Souza',     '50240373', 4),
+        ('Lucas Oliveira',           '50240374', 2),
+      ] %}
+      {% for nome, matricula, faltas_mes in alunos %}
+      <div class="card-chamada" id="card-{{ loop.index }}">
+        <div class="chamada-aluno-info">
+          <div class="aluno-avatar">{{ nome[0] }}</div>
+          <div>
+            <p class="aluno-nome">{{ nome }}</p>
+            <p class="aluno-faltas-mes">
+              {% if faltas_mes == 0 %}
+                Nenhuma falta no mês
+              {% elif faltas_mes == 1 %}
+                1 falta no mês
+              {% else %}
+                {{ faltas_mes }} faltas no mês
+              {% endif %}
+            </p>
+          </div>
+        </div>
+        <button class="btn-status presente" id="btn-{{ loop.index }}" onclick="toggleStatus({{ loop.index }})">
+          <span class="status-icone">✅</span>
+          <span class="status-texto">Presente</span>
+        </button>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="chamada-rodape">
+      <button class="btn-voltar-chamada" onclick="voltarSelecao()">← Voltar</button>
+      <button class="btn-salvar-nota-prof" id="btn-salvar" onclick="salvarChamada()">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+          <path d="M17 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7l-4-4zm-5 16a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm3-10H5V5h10v4z"/>
+        </svg>
+        Salvar Chamada
+      </button>
+    </div>
+
+  </div>
+
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script>
+function habilitarTurma() {
+  const curso = document.getElementById('select-curso-falta').value;
+  document.getElementById('select-turma-falta').disabled = !curso;
+  document.getElementById('select-turma-falta').value = '';
+}
+
+function abrirChamada() {
+  const turma = document.getElementById('select-turma-falta').value;
+  if (!turma) {
+    alert('Selecione uma turma antes de abrir a chamada.');
+    return;
+  }
+
+  const hoje = new Date();
+  const opcoes = { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' };
+  document.getElementById('chamada-data').textContent = hoje.toLocaleDateString('pt-BR', opcoes);
+  document.getElementById('chamada-turma-label').textContent = turma;
+
+  document.getElementById('card-selecao').classList.add('oculto');
+  document.getElementById('card-chamada').classList.remove('oculto');
+}
+
+function voltarSelecao() {
+  document.getElementById('card-chamada').classList.add('oculto');
+  document.getElementById('card-selecao').classList.remove('oculto');
+}
+
+function toggleStatus(index) {
+  const btn  = document.getElementById('btn-' + index);
+  const card = document.getElementById('card-' + index);
+  const isPresente = btn.classList.contains('presente');
+
+  if (isPresente) {
+    btn.classList.replace('presente', 'falta');
+    btn.querySelector('.status-icone').textContent = '❌';
+    btn.querySelector('.status-texto').textContent = 'Falta';
+    card.classList.add('card-falta-ativo');
+  } else {
+    btn.classList.replace('falta', 'presente');
+    btn.querySelector('.status-icone').textContent = '✅';
+    btn.querySelector('.status-texto').textContent = 'Presente';
+    card.classList.remove('card-falta-ativo');
+  }
+}
+
+function salvarChamada() {
+  const btn = document.getElementById('btn-salvar');
+  btn.textContent = '✅ Chamada salva!';
+  btn.style.background = '#16a34a';
+  setTimeout(() => {
+    btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M17 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7l-4-4zm-5 16a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm3-10H5V5h10v4z"/></svg> Salvar Chamada';
+    btn.style.background = '';
+  }, 2000);
+}
+</script>
+{% endblock %}

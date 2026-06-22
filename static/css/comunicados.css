@@ -1,0 +1,423 @@
+/* ============================================================
+   comunicados.css — Página de Comentários/Comunicados do Aluno
+   Alfa Profissionalizantes
+   ============================================================ */
+
+.comunicados-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 800px;
+}
+
+/* ===== Cabeçalho ===== */
+.comunicados-cabecalho {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 18px 20px;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e8eef8;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  color: #1a3a8f;
+}
+
+.comunicados-titulo {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin: 0 0 4px 0;
+}
+
+.comunicados-subtitulo {
+  font-size: 0.82rem;
+  color: #64748b;
+  margin: 0;
+}
+
+/* ===== Lista ===== */
+.lista-comunicados {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ===== Card comunicado ===== */
+.card-comunicado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e8eef8;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  text-decoration: none;
+  color: #1a1a2e;
+  transition: box-shadow 0.2s, transform 0.15s;
+}
+
+.card-comunicado:hover {
+  box-shadow: 0 4px 16px rgba(26, 58, 143, 0.12);
+  transform: translateY(-1px);
+}
+
+.card-comunicado-esquerda {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* ===== Ícone PDF ===== */
+.icone-pdf {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  background: #eef2ff;
+  border-radius: 10px;
+  border: 1px solid #c7d2fe;
+  color: #1a3a8f;
+  flex-shrink: 0;
+  gap: 1px;
+}
+
+.pdf-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: #1a3a8f;
+  letter-spacing: 0.5px;
+}
+
+/* ===== Info do comunicado ===== */
+.comunicado-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.comunicado-titulo {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+.comunicado-descricao {
+  font-size: 0.82rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.comunicado-data {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.78rem;
+  color: #94a3b8;
+  margin: 0;
+}
+
+.comunicado-data svg {
+  fill: #94a3b8;
+}
+
+/* ===== Seta direita ===== */
+.card-comunicado-direita {
+  color: #94a3b8;
+  flex-shrink: 0;
+}
+
+/* ===== Vazio ===== */
+.vazio {
+  text-align: center;
+  color: #94a3b8;
+  font-size: 0.9rem;
+  padding: 40px 0;
+}
+
+/* ===== Responsivo ===== */
+@media (max-width: 600px) {
+  .card-comunicado {
+    padding: 14px 16px;
+  }
+
+  .icone-pdf {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/* ============================================================
+   comunicados.css — Adicional para tela do Professor
+   ============================================================ */
+
+.comunicados-topo {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-cadastrar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: #1a3a8f;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.btn-cadastrar:hover {
+  background: #1f47b0;
+  transform: translateY(-1px);
+}
+
+.comunicado-rodape {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 2px;
+}
+
+.badge-tipo {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+  letter-spacing: 0.3px;
+}
+
+.badge-tipo.turma {
+  background: #eef2ff;
+  color: #1a3a8f;
+  border: 1px solid #c7d2fe;
+}
+
+.badge-tipo.aluno {
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #86efac;
+}
+
+/* ===== Modal ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 200;
+}
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #ffffff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 500px;
+  z-index: 201;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid #e8eef8;
+}
+
+.modal-header h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+.modal-fechar {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.modal-fechar:hover {
+  background: #f0f4ff;
+  color: #1a3a8f;
+}
+
+.modal-corpo {
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.campo-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.campo-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.campo-input,
+.campo-select {
+  padding: 11px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  color: #1a1a2e;
+  background: #ffffff;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.campo-input:focus,
+.campo-select:focus {
+  border-color: #1a3a8f;
+}
+
+.radio-grupo {
+  display: flex;
+  gap: 20px;
+}
+
+.radio-opcao {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.88rem;
+  color: #374151;
+  cursor: pointer;
+}
+
+.campo-upload {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border: 2px dashed #d1d5db;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #64748b;
+  font-size: 0.88rem;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.campo-upload:hover {
+  border-color: #1a3a8f;
+  background: #f8faff;
+  color: #1a3a8f;
+}
+
+.modal-rodape {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 24px 20px;
+  border-top: 1px solid #e8eef8;
+}
+
+.btn-cancelar {
+  padding: 10px 20px;
+  background: transparent;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #64748b;
+  cursor: pointer;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  transition: background 0.2s;
+}
+
+.btn-cancelar:hover { background: #f8faff; }
+
+.btn-enviar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: #1a3a8f;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  transition: background 0.2s;
+}
+
+.btn-enviar:hover { background: #1f47b0; }
+
+.oculto { display: none; }
+
+/* ============================================================
+   comunicados.css — Visual centralizado professor
+   ============================================================ */
+
+.comunicados-prof-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.comunicados-prof-topo {
+  width: 100%;
+  max-width: 700px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.comunicados-prof-card {
+  width: 100%;
+  max-width: 700px;
+  background: #ffffff;
+  border-radius: 18px;
+  border: 1px solid #e8eef8;
+  box-shadow: 0 4px 24px rgba(26,58,143,0.08);
+  overflow: hidden;
+}
+
+.comunicados-prof-card .comunicados-cabecalho {
+  border-radius: 0;
+  border: none;
+  border-bottom: 1px solid #e8eef8;
+  box-shadow: none;
+}
+
+.comunicados-prof-card .lista-comunicados {
+  padding: 12px;
+  gap: 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+.comunicados-prof-card .card-comunicado {
+  border-radius: 10px;
+}

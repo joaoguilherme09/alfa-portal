@@ -1,5 +1,5 @@
 /* ============================================================
-   home.css — Home do aluno
+   home.css — Home do Aluno e Professor
    Alfa Profissionalizantes
    ============================================================ */
 
@@ -9,22 +9,20 @@
   gap: 24px;
 }
 
-/* ===== Banner ===== */
+/* ===== Banner aluno ===== */
 .banner-home {
   position: relative;
   width: 100%;
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 4px 24px rgba(0,0,0,0.12);
-  max-height: 420px;
 }
 
 .banner-imagem {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center top;
+  height: auto;
   display: block;
+  object-fit: contain;
 }
 
 .banner-overlay {
@@ -35,21 +33,137 @@
 }
 
 .banner-logo {
-  width: 80px;
-  height: 80px;
+  width: 72px;
+  height: 72px;
   object-fit: contain;
   filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
 }
 
+/* ===== Home professor ===== */
+.saudacao {
+  margin-bottom: 4px;
+}
+
+.saudacao h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0 0 4px 0;
+}
+
+.saudacao p {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.resumo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.resumo-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #e8eef8;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.resumo-icone {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.resumo-icone.azul    { background: #eef2ff; color: #1a3a8f; }
+.resumo-icone.laranja { background: #fff7ed; color: #ea580c; }
+.resumo-icone.verde   { background: #f0fdf4; color: #16a34a; }
+.resumo-icone.roxo    { background: #faf5ff; color: #7c3aed; }
+.resumo-icone svg     { fill: currentColor; }
+
+.resumo-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.resumo-numero {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  line-height: 1;
+}
+
+.resumo-label {
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+.turmas-hoje {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.secao-titulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+.lista-turmas-hoje {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card-turma-hoje {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e8eef8;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.turma-cor {
+  width: 4px;
+  height: 40px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.turma-cor.azul    { background: #1a3a8f; }
+.turma-cor.verde   { background: #16a34a; }
+.turma-cor.laranja { background: #ea580c; }
+
+.turma-nome {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin: 0 0 3px 0;
+}
+
+.turma-horario {
+  font-size: 0.82rem;
+  color: #64748b;
+  margin: 0;
+}
+
 /* ===== Responsivo ===== */
 @media (max-width: 768px) {
-  .banner-home {
-    border-radius: 12px;
-    max-height: 220px;
-  }
-
-  .banner-logo {
-    width: 56px;
-    height: 56px;
-  }
+  .banner-home  { border-radius: 12px; }
+  .banner-logo  { width: 52px; height: 52px; }
 }

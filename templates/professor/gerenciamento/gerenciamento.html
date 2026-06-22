@@ -1,0 +1,423 @@
+{% extends "professor/base_professor.html" %}
+
+{% block titulo %}Gerenciamento{% endblock %}
+{% block pagina_titulo %}Gerenciamento{% endblock %}
+
+{% block estilo %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/gerenciamento.css') }}">
+{% endblock %}
+
+{% block conteudo %}
+
+<div class="gerenciamento-wrapper">
+
+  <!-- Abas -->
+  <div class="abas">
+    <button class="aba ativa" onclick="trocarAba('cursos', this)">Cursos</button>
+    <button class="aba" onclick="trocarAba('turmas', this)">Turmas</button>
+    <button class="aba" onclick="trocarAba('professores', this)">Professores</button>
+    <button class="aba" onclick="trocarAba('alunos', this)">Alunos</button>
+  </div>
+
+  <!-- ===== CURSOS ===== -->
+  <div class="painel-aba" id="painel-cursos">
+    <div class="secao-topo">
+      <h3 class="secao-titulo">Cursos cadastrados</h3>
+    </div>
+    <div class="grid-cursos">
+      {% set cursos = ['Informática', 'Inglês', 'ENEM', 'Embraer', 'Reforço', 'Alfabetização'] %}
+      {% for curso in cursos %}
+      <div class="card-curso-ger">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="28" height="28">
+          <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/>
+        </svg>
+        <span>{{ curso }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- ===== TURMAS ===== -->
+  <div class="painel-aba oculto" id="painel-turmas">
+    <div class="secao-topo">
+      <h3 class="secao-titulo">Turmas cadastradas</h3>
+      <button class="btn-cadastrar" onclick="abrirModal('modal-turma')">+ Nova Turma</button>
+    </div>
+    <div class="lista-ger">
+      {% set turmas = [
+        ('Segunda e Quarta 19h às 20h', 'Informática', 'Pierre Souza'),
+        ('Terça e Quinta 14h às 16h',   'ENEM',        'Pierre Souza'),
+        ('Sábado 09h às 11h',           'Inglês',      'Pierre Souza'),
+      ] %}
+      {% for nome, curso, prof in turmas %}
+      <div class="card-ger">
+        <div class="card-ger-info">
+          <p class="card-ger-titulo">{{ nome }}</p>
+          <p class="card-ger-sub">{{ curso }} — {{ prof }}</p>
+        </div>
+        <div class="card-ger-acoes">
+          <button class="btn-acao editar">Editar</button>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- ===== PROFESSORES ===== -->
+  <div class="painel-aba oculto" id="painel-professores">
+    <div class="secao-topo">
+      <h3 class="secao-titulo">Professores cadastrados</h3>
+      <button class="btn-cadastrar" onclick="abrirModal('modal-professor')">+ Novo Professor</button>
+    </div>
+    <div class="lista-ger">
+      {% set professores = [
+        ('Pierre Souza', 'prof01', 'Informática, ENEM, Inglês'),
+      ] %}
+      {% for nome, matricula, cursos in professores %}
+      <div class="card-ger">
+        <div class="card-ger-esquerda">
+          <div class="aluno-avatar">{{ nome[0] }}</div>
+          <div class="card-ger-info">
+            <p class="card-ger-titulo">{{ nome }}</p>
+            <p class="card-ger-sub">Matrícula: {{ matricula }}</p>
+            <p class="card-ger-sub">{{ cursos }}</p>
+          </div>
+        </div>
+        <div class="card-ger-acoes">
+          <button class="btn-acao editar">Editar</button>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- ===== ALUNOS ===== -->
+  <div class="painel-aba oculto" id="painel-alunos">
+    <div class="secao-topo">
+      <h3 class="secao-titulo">Alunos cadastrados</h3>
+      <button class="btn-cadastrar" onclick="abrirModal('modal-aluno')">+ Cadastrar Aluno</button>
+    </div>
+
+    <!-- Filtro -->
+    <div class="filtro-alunos">
+      <select class="campo-select" id="filtro-curso">
+        <option value="">Todos os cursos</option>
+        <option>Informática</option><option>Inglês</option><option>ENEM</option>
+        <option>Embraer</option><option>Reforço</option><option>Alfabetização</option>
+      </select>
+      <select class="campo-select" id="filtro-turma">
+        <option value="">Todas as turmas</option>
+        <option>Segunda e Quarta 19h às 20h</option>
+        <option>Terça e Quinta 14h às 16h</option>
+        <option>Sábado 09h às 11h</option>
+      </select>
+    </div>
+
+    <div class="lista-ger">
+      {% set alunos = [
+        ('João Guilherme P. Mendes', '50240371', 'Informática'),
+        ('Maria Clara Silva',        '50240372', 'ENEM'),
+        ('Pedro Henrique Souza',     '50240373', 'Inglês'),
+        ('Lucas Oliveira',           '50240374', 'Informática'),
+      ] %}
+      {% for nome, matricula, curso in alunos %}
+      <div class="card-ger">
+        <div class="card-ger-esquerda">
+          <div class="aluno-avatar">{{ nome[0] }}</div>
+          <div class="card-ger-info">
+            <p class="card-ger-titulo">{{ nome }}</p>
+            <p class="card-ger-sub">Matrícula: {{ matricula }} — {{ curso }}</p>
+          </div>
+        </div>
+        <div class="card-ger-acoes">
+          <button class="btn-acao editar">Editar</button>
+          <button class="btn-acao matricula" onclick="abrirModal('modal-aluno')">Matrícula</button>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+</div>
+
+<!-- ===== MODAL NOVA TURMA ===== -->
+<div class="modal-overlay oculto" id="overlay-modal-turma" onclick="fecharModal('modal-turma')"></div>
+<div class="modal oculto" id="modal-turma">
+  <div class="modal-header">
+    <h3>Nova Turma</h3>
+    <button class="modal-fechar" onclick="fecharModal('modal-turma')">✕</button>
+  </div>
+  <div class="modal-corpo">
+    <div class="campo-grupo">
+      <label class="campo-label">Nome da turma</label>
+      <input type="text" class="campo-input" placeholder="Ex: Terça e Quinta 14h às 16h"/>
+    </div>
+    <div class="campo-grupo">
+      <label class="campo-label">Curso</label>
+      <select class="campo-select">
+        <option>Informática</option><option>Inglês</option><option>ENEM</option>
+        <option>Embraer</option><option>Reforço</option><option>Alfabetização</option>
+      </select>
+    </div>
+    <div class="campo-grupo">
+      <label class="campo-label">Professor</label>
+      <select class="campo-select"><option>Pierre Souza</option></select>
+    </div>
+    <div class="campo-grupo">
+      <label class="campo-label">Dias da semana</label>
+      <div class="dias-semana">
+        {% for dia in ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'] %}
+        <label class="dia-btn"><input type="checkbox" value="{{ dia }}"/> {{ dia }}</label>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="campo-grupo">
+      <label class="campo-label">Horário</label>
+      <input type="text" class="campo-input" placeholder="Ex: 14h às 16h"/>
+    </div>
+    <div class="campo-grupo">
+      <label class="campo-label">Período</label>
+      <select class="campo-select">
+        <option>Manhã</option><option>Tarde</option><option>Noite</option>
+      </select>
+    </div>
+  </div>
+  <div class="modal-rodape">
+    <button class="btn-cancelar" onclick="fecharModal('modal-turma')">Cancelar</button>
+    <button class="btn-enviar">Salvar</button>
+  </div>
+</div>
+
+<!-- ===== MODAL NOVO PROFESSOR ===== -->
+<div class="modal-overlay oculto" id="overlay-modal-professor" onclick="fecharModal('modal-professor')"></div>
+<div class="modal oculto" id="modal-professor">
+  <div class="modal-header">
+    <h3>Novo Professor</h3>
+    <button class="modal-fechar" onclick="fecharModal('modal-professor')">✕</button>
+  </div>
+  <div class="modal-corpo">
+    <div class="campo-grupo">
+      <label class="campo-label">Nome</label>
+      <input type="text" class="campo-input" placeholder="Nome completo"/>
+    </div>
+    <div class="campo-grupo">
+      <label class="campo-label">Matrícula</label>
+      <input type="text" class="campo-input" placeholder="Ex: prof02"/>
+    </div>
+    <div class="campo-grupo">
+      <label class="campo-label">Senha</label>
+      <input type="password" class="campo-input" placeholder="Senha de acesso"/>
+    </div>
+    <div class="campo-grupo">
+      <label class="campo-label">Cargo</label>
+      <select class="campo-select">
+        <option>Professor</option><option>Admin</option>
+      </select>
+    </div>
+    <div class="campo-grupo">
+      <label class="campo-label">Foto</label>
+      <label class="campo-upload">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+          <path d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+        </svg>
+        <span>Selecionar foto</span>
+        <input type="file" accept="image/*" style="display:none"/>
+      </label>
+    </div>
+  </div>
+  <div class="modal-rodape">
+    <button class="btn-cancelar" onclick="fecharModal('modal-professor')">Cancelar</button>
+    <button class="btn-enviar">Salvar</button>
+  </div>
+</div>
+
+<!-- ===== MODAL CADASTRAR ALUNO ===== -->
+<div class="modal-overlay oculto" id="overlay-modal-aluno" onclick="fecharModal('modal-aluno')"></div>
+<div class="modal oculto" id="modal-aluno">
+  <div class="modal-header">
+    <h3>Cadastrar Aluno</h3>
+    <button class="modal-fechar" onclick="fecharModal('modal-aluno')">✕</button>
+  </div>
+  <div class="modal-corpo">
+
+    <p class="secao-grupo">Dados do Responsável</p>
+    <div class="campo-grupo">
+      <label class="campo-label">Nome do responsável</label>
+      <input type="text" class="campo-input" placeholder="Nome completo"/>
+    </div>
+    <div class="campos-linha">
+      <div class="campo-grupo">
+        <label class="campo-label">Nascimento</label>
+        <input type="date" class="campo-input"/>
+      </div>
+      <div class="campo-grupo">
+        <label class="campo-label">CPF</label>
+        <input type="text" class="campo-input" placeholder="000.000.000-00"/>
+      </div>
+    </div>
+    <div class="campos-linha">
+      <div class="campo-grupo">
+        <label class="campo-label">RG</label>
+        <input type="text" class="campo-input" placeholder="00.000.000-0"/>
+      </div>
+      <div class="campo-grupo">
+        <label class="campo-label">Telefone</label>
+        <input type="text" class="campo-input" placeholder="(12) 00000-0000"/>
+      </div>
+    </div>
+
+    <p class="secao-grupo">Dados do Aluno</p>
+    <div class="campo-grupo">
+      <label class="campo-label">Nome do aluno</label>
+      <input type="text" class="campo-input" placeholder="Nome completo"/>
+    </div>
+    <div class="campo-grupo">
+      <label class="campo-label">Nascimento</label>
+      <input type="date" class="campo-input"/>
+    </div>
+    <div class="campo-grupo">
+      <label class="campo-label">Endereço</label>
+      <input type="text" class="campo-input" placeholder="Rua, Avenida..."/>
+    </div>
+    <div class="campos-linha">
+      <div class="campo-grupo">
+        <label class="campo-label">Número</label>
+        <input type="text" class="campo-input" placeholder="Nº"/>
+      </div>
+      <div class="campo-grupo">
+        <label class="campo-label">Bairro</label>
+        <input type="text" class="campo-input" placeholder="Bairro"/>
+      </div>
+    </div>
+    <div class="campos-linha">
+      <div class="campo-grupo">
+        <label class="campo-label">Cidade</label>
+        <input type="text" class="campo-input" value="São José dos Campos"/>
+      </div>
+      <div class="campo-grupo">
+        <label class="campo-label">CEP</label>
+        <input type="text" class="campo-input" placeholder="00000-000"/>
+      </div>
+    </div>
+
+    <p class="secao-grupo">Dados Acadêmicos</p>
+    <div class="campo-grupo">
+      <label class="campo-label">Curso</label>
+      <select class="campo-select">
+        <option value="">Selecione o curso</option>
+        <option>Informática</option><option>Inglês</option><option>ENEM</option>
+        <option>Embraer</option><option>Reforço</option><option>Alfabetização</option>
+      </select>
+    </div>
+    <div class="campo-grupo">
+      <label class="campo-label">Turma</label>
+      <select class="campo-select">
+        <option value="">Selecione a turma</option>
+        <option>Segunda e Quarta 19h às 20h</option>
+        <option>Terça e Quinta 14h às 16h</option>
+        <option>Sábado 09h às 11h</option>
+      </select>
+    </div>
+    <div class="campo-grupo">
+      <label class="campo-label">Período</label>
+      <select class="campo-select">
+        <option>Manhã</option><option>Tarde</option><option>Noite</option>
+      </select>
+    </div>
+    <div class="campo-grupo">
+      <label class="campo-label">Foto do aluno</label>
+      <label class="campo-upload">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+          <path d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+        </svg>
+        <span>Selecionar foto</span>
+        <input type="file" accept="image/*" style="display:none"/>
+      </label>
+    </div>
+
+  </div>
+  <div class="modal-rodape">
+    <button class="btn-cancelar" onclick="fecharModal('modal-aluno')">Cancelar</button>
+    <button class="btn-matricula" onclick="abrirModal('modal-matricula')">Fazer Matrícula</button>
+    <button class="btn-enviar">Salvar</button>
+  </div>
+</div>
+
+<!-- ===== MODAL MATRÍCULA ===== -->
+<div class="modal-overlay oculto" id="overlay-modal-matricula" onclick="fecharModal('modal-matricula')"></div>
+<div class="modal oculto" id="modal-matricula">
+  <div class="modal-header">
+    <h3>Fazer Matrícula</h3>
+    <button class="modal-fechar" onclick="fecharModal('modal-matricula')">✕</button>
+  </div>
+  <div class="modal-corpo">
+    <div class="campo-grupo">
+      <label class="campo-label">Curso / Matéria</label>
+      <input type="text" class="campo-input" placeholder="Ex: Reforço Escolar"/>
+    </div>
+    <div class="campo-grupo">
+      <label class="campo-label">Módulo</label>
+      <input type="text" class="campo-input" placeholder="Ex: Português – Matemática"/>
+    </div>
+    <div class="campos-linha">
+      <div class="campo-grupo">
+        <label class="campo-label">Preço total</label>
+        <input type="text" class="campo-input" placeholder="Ex: R$ 1.200,00"/>
+      </div>
+      <div class="campo-grupo">
+        <label class="campo-label">Nº de parcelas</label>
+        <input type="number" class="campo-input" placeholder="Ex: 12"/>
+      </div>
+    </div>
+    <div class="campos-linha">
+      <div class="campo-grupo">
+        <label class="campo-label">Parcelas por extenso</label>
+        <input type="text" class="campo-input" placeholder="Ex: DOZE"/>
+      </div>
+      <div class="campo-grupo">
+        <label class="campo-label">Valor da parcela</label>
+        <input type="text" class="campo-input" placeholder="Ex: R$ 100,00"/>
+      </div>
+    </div>
+    <div class="campo-grupo">
+      <label class="campo-label">Data do 1º pagamento</label>
+      <input type="date" class="campo-input"/>
+    </div>
+    <div class="campo-grupo">
+      <label class="campo-label">Dia e horário</label>
+      <input type="text" class="campo-input" placeholder="Ex: Terça e Quinta 14h às 16h"/>
+    </div>
+  </div>
+  <div class="modal-rodape">
+    <button class="btn-cancelar" onclick="fecharModal('modal-matricula')">Cancelar</button>
+    <button class="btn-enviar">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+      </svg>
+      Gerar Contrato PDF
+    </button>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script>
+function trocarAba(aba, botao) {
+  document.querySelectorAll('.painel-aba').forEach(p => p.classList.add('oculto'));
+  document.querySelectorAll('.aba').forEach(b => b.classList.remove('ativa'));
+  document.getElementById('painel-' + aba).classList.remove('oculto');
+  botao.classList.add('ativa');
+}
+
+function abrirModal(id) {
+  document.getElementById('overlay-' + id).classList.remove('oculto');
+  document.getElementById(id).classList.remove('oculto');
+}
+
+function fecharModal(id) {
+  document.getElementById('overlay-' + id).classList.add('oculto');
+  document.getElementById(id).classList.add('oculto');
+}
+</script>
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends "professor/base_professor.html" %}
+
+{% block titulo %}Home{% endblock %}
+{% block pagina_titulo %}Home{% endblock %}
+
+{% block estilo %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+{% endblock %}
+
+{% block conteudo %}
+
+<div class="home-wrapper">
+
+  <!-- Saudação -->
+  <div class="saudacao">
+    <h2>Bem-vindo, {{ session.nome.split()[0] if session.nome else 'Professor' }}! 👋</h2>
+    <p>Aqui está o resumo de hoje.</p>
+  </div>
+
+  <!-- Cards de resumo -->
+  <div class="resumo-grid">
+
+    <div class="resumo-card">
+      <div class="resumo-icone azul">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+          <path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1h-2zm3 18H5V8h14v11z"/>
+        </svg>
+      </div>
+      <div class="resumo-info">
+        <span class="resumo-numero">3</span>
+        <span class="resumo-label">Turmas hoje</span>
+      </div>
+    </div>
+
+    <div class="resumo-card">
+      <div class="resumo-icone laranja">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+        </svg>
+      </div>
+      <div class="resumo-info">
+        <span class="resumo-numero">2</span>
+        <span class="resumo-label">Chamadas pendentes</span>
+      </div>
+    </div>
+
+    <div class="resumo-card">
+      <div class="resumo-icone verde">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+          <path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm-7 3a3 3 0 1 1 0 6 3 3 0 0 1 0-6zm6 12H6v-.5c0-2 4-3.1 6-3.1s6 1.1 6 3.1V18z"/>
+        </svg>
+      </div>
+      <div class="resumo-info">
+        <span class="resumo-numero">4</span>
+        <span class="resumo-label">Notas lançadas hoje</span>
+      </div>
+    </div>
+
+    <div class="resumo-card">
+      <div class="resumo-icone roxo">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+          <path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z"/>
+        </svg>
+      </div>
+      <div class="resumo-info">
+        <span class="resumo-numero">1</span>
+        <span class="resumo-label">Comunicado enviado</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Turmas de hoje -->
+  <div class="turmas-hoje">
+    <h3 class="secao-titulo">Turmas de hoje</h3>
+    <div class="lista-turmas-hoje">
+
+      <div class="card-turma-hoje">
+        <div class="turma-cor azul"></div>
+        <div class="turma-info">
+          <p class="turma-nome">Informática</p>
+          <p class="turma-horario">Segunda e Quarta — 19h às 20h</p>
+        </div>
+      </div>
+
+      <div class="card-turma-hoje">
+        <div class="turma-cor verde"></div>
+        <div class="turma-info">
+          <p class="turma-nome">ENEM</p>
+          <p class="turma-horario">Terça e Quinta — 14h às 16h</p>
+        </div>
+      </div>
+
+      <div class="card-turma-hoje">
+        <div class="turma-cor laranja"></div>
+        <div class="turma-info">
+          <p class="turma-nome">Inglês</p>
+          <p class="turma-horario">Sábado — 09h às 11h</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

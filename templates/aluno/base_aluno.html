@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block titulo %}Portal Aluno{% endblock %} — Alfa Profissionalizantes</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
+  {% block estilo %}{% endblock %}
+</head>
+<body class="painel">
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar" id="sidebar">
+
+    <div class="sidebar-topo">
+      <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Alfa" class="sidebar-logo"/>
+
+      <div class="sidebar-avatar">
+        {% if session.foto %}
+          <img src="{{ url_for('static', filename='uploads/fotos/' ~ session.foto) }}" alt="Foto"/>
+        {% else %}
+          <div class="avatar-placeholder">
+            {{ session.nome[0] | upper if session.nome else 'A' }}
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="sidebar-info">
+        <p class="sidebar-nome">{{ session.nome or 'Aluno' }}</p>
+        <p class="sidebar-detalhe">Matrícula: <span>{{ session.matricula or '—' }}</span></p>
+        <p class="sidebar-detalhe">Curso: <span class="destaque-azul">{{ session.curso or '—' }}</span></p>
+        <p class="sidebar-detalhe">Período: <span class="destaque-azul">{{ session.periodo or '—' }}</span></p>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="{{ url_for('aluno.home') }}"
+         class="nav-item {% if request.endpoint == 'aluno.home' %}ativo{% endif %}">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+          <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+        </svg>
+        Home
+      </a>
+
+      <a href="{{ url_for('aluno.notas') }}"
+         class="nav-item {% if 'notas' in request.endpoint %}ativo{% endif %}">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+          <path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm-7 3a3 3 0 1 1 0 6 3 3 0 0 1 0-6zm6 12H6v-.5c0-2 4-3.1 6-3.1s6 1.1 6 3.1V18z"/>
+        </svg>
+        Notas
+      </a>
+
+      <a href="{{ url_for('aluno.faltas') }}"
+         class="nav-item {% if 'faltas' in request.endpoint %}ativo{% endif %}">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+          <path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1h-2zm3 18H5V8h14v11z"/>
+        </svg>
+        Faltas
+      </a>
+
+      <a href="{{ url_for('aluno.comentarios') }}"
+         class="nav-item {% if 'comentarios' in request.endpoint %}ativo{% endif %}">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+          <path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z"/>
+        </svg>
+        Comentários
+      </a>
+    </nav>
+
+    <div class="sidebar-rodape">
+      <a href="{{ url_for('auth.logout') }}" class="nav-item sair">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+          <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5-5-5zM4 5h8V3H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8v-2H4V5z"/>
+        </svg>
+        Sair
+      </a>
+    </div>
+
+  </aside>
+
+  <!-- ===== CONTEÚDO PRINCIPAL ===== -->
+  <main class="conteudo">
+
+    <!-- Header da página -->
+    <header class="pagina-header">
+      <button class="btn-menu" onclick="toggleSidebar()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <h2 class="pagina-titulo">{% block pagina_titulo %}Home{% endblock %}</h2>
+      <div class="header-acoes">
+        <button class="btn-sino" aria-label="Notificações">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+            <path d="M12 22a2 2 0 0 0 2-2h-4a2 2 0 0 0 2 2zm6-6V11a6 6 0 0 0-5-5.91V4a1 1 0 0 0-2 0v1.09A6 6 0 0 0 6 11v5l-2 2v1h16v-1l-2-2z"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Conteúdo da página filha -->
+    <div class="pagina-corpo">
+      {% block conteudo %}{% endblock %}
+    </div>
+
+  </main>
+
+  <!-- Overlay mobile -->
+  <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+  <script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
+  {% block script %}{% endblock %}
+</body>
+</html>

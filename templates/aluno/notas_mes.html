@@ -1,0 +1,69 @@
+{% extends "aluno/base_aluno.html" %}
+
+{% block titulo %}Notas — {{ nome_mes }}{% endblock %}
+{% block pagina_titulo %}Notas{% endblock %}
+
+{% block estilo %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/notas.css') }}">
+{% endblock %}
+
+{% block conteudo %}
+
+<div class="notas-wrapper">
+
+  <a href="{{ url_for('aluno.notas') }}" class="btn-voltar">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+      <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+    </svg>
+    Voltar para meses
+  </a>
+
+  <div class="cabecalho-mes">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+      <path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1h-2zm3 18H5V8h14v11z"/>
+    </svg>
+    <div>
+      <h2 class="titulo-mes">{{ nome_mes }}</h2>
+      <p class="subtitulo-mes">Atividades e notas do mês</p>
+    </div>
+  </div>
+
+  <div class="lista-ultimas">
+
+    {% if notas %}
+      {% for nota in notas %}
+      <div class="card-nota">
+        <div class="card-nota-info">
+          <p class="nota-nome">{{ nota.nome }}</p>
+          <p class="nota-data">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="13" height="13">
+              <path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1h-2zm3 18H5V8h14v11z"/>
+            </svg>
+            {{ nota.data }}
+          </p>
+        </div>
+        <div class="card-nota-valor">
+          <span class="valor">{{ nota.valor }}</span>
+          <small>NOTA</small>
+        </div>
+      </div>
+      {% endfor %}
+
+      <!-- Média final -->
+      <div class="card-media">
+        <span class="media-label">MÉDIA FINAL DO MÊS</span>
+        <div class="card-nota-valor">
+          <span class="valor media-valor">{{ media }}</span>
+          <small>MÉDIA</small>
+        </div>
+      </div>
+
+    {% else %}
+      <p class="vazio">Nenhuma nota registrada para {{ nome_mes }}.</p>
+    {% endif %}
+
+  </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,759 @@
+/* ============================================================
+   notas.css — Página de Notas do Aluno
+   Alfa Profissionalizantes
+   ============================================================ */
+
+.notas-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 800px;
+}
+
+/* ===== Abas ===== */
+.abas {
+  display: flex;
+  gap: 8px;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 6px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  width: fit-content;
+}
+
+.aba {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #64748b;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+.aba:hover {
+  background: #f0f4ff;
+  color: #1a3a8f;
+}
+
+.aba.ativa {
+  background: #1a3a8f;
+  color: #ffffff;
+}
+
+/* ===== Instrução ===== */
+.instrucao {
+  font-size: 0.88rem;
+  color: #64748b;
+  margin-bottom: 4px;
+}
+
+/* ===== Painel oculto ===== */
+.oculto { display: none; }
+
+/* ===== Lista de meses ===== */
+.lista-meses {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card-mes {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: #ffffff;
+  border-radius: 12px;
+  text-decoration: none;
+  color: #1a1a2e;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  border: 1px solid #e8eef8;
+  transition: box-shadow 0.2s, transform 0.15s;
+}
+
+.card-mes:hover {
+  box-shadow: 0 4px 16px rgba(26, 58, 143, 0.12);
+  transform: translateY(-1px);
+}
+
+.card-mes-esquerda {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.icone-mes { color: #1a3a8f; opacity: 0.7; }
+.nome-mes  { font-size: 0.95rem; font-weight: 500; }
+
+.card-mes-direita {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #64748b;
+}
+
+.qtd-notas {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #1a3a8f;
+}
+
+.qtd-notas small {
+  font-weight: 400;
+  color: #64748b;
+  margin-left: 2px;
+}
+
+.seta { color: #94a3b8; }
+
+/* ===== Lista de notas ===== */
+.lista-ultimas {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card-nota {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  border: 1px solid #e8eef8;
+}
+
+.card-nota-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.nota-nome {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+.nota-data {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.8rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.nota-data svg { fill: #94a3b8; }
+
+.card-nota-valor {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.valor {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #1a3a8f;
+}
+
+.card-nota-valor small {
+  font-size: 0.68rem;
+  color: #94a3b8;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+/* ===== Média final ===== */
+.card-media {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  background: #eef2ff;
+  border-radius: 12px;
+  border: 1px solid #c7d2fe;
+  margin-top: 4px;
+}
+
+.media-label {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #1a3a8f;
+}
+
+.media-valor { color: #1a3a8f; }
+
+/* ===== Voltar ===== */
+.btn-voltar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.88rem;
+  color: #1a3a8f;
+  text-decoration: none;
+  font-weight: 500;
+  transition: opacity 0.2s;
+}
+
+.btn-voltar:hover { opacity: 0.7; }
+
+/* ===== Cabeçalho do mês ===== */
+.cabecalho-mes {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e8eef8;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  color: #1a3a8f;
+}
+
+.titulo-mes {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+.subtitulo-mes {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin: 0;
+}
+
+/* ===== Vazio ===== */
+.vazio {
+  text-align: center;
+  color: #94a3b8;
+  font-size: 0.9rem;
+  padding: 40px 0;
+}
+
+/* ===== Responsivo ===== */
+@media (max-width: 600px) {
+  .abas { width: 100%; }
+  .aba  { flex: 1; justify-content: center; }
+}
+
+/* ============================================================
+   notas.css — Adicional para tela do Professor
+   ============================================================ */
+
+/* ===== Passos ===== */
+.passo {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 800px;
+}
+
+.passo-titulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+
+.passo-numero {
+  width: 28px;
+  height: 28px;
+  background: #1a3a8f;
+  color: #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.destaque {
+  color: #1a3a8f;
+  font-weight: 600;
+}
+
+.btn-voltar-passo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.88rem;
+  color: #1a3a8f;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-weight: 500;
+  padding: 0;
+  transition: opacity 0.2s;
+}
+
+.btn-voltar-passo:hover { opacity: 0.7; }
+
+/* ===== Grid de cursos ===== */
+.grid-cursos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.card-curso {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 24px 16px;
+  background: #ffffff;
+  border: 1px solid #e8eef8;
+  border-radius: 14px;
+  cursor: pointer;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #1a1a2e;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  transition: box-shadow 0.2s, transform 0.15s, border-color 0.2s;
+}
+
+.card-curso svg { color: #1a3a8f; }
+
+.card-curso:hover {
+  border-color: #1a3a8f;
+  box-shadow: 0 4px 16px rgba(26,58,143,0.12);
+  transform: translateY(-2px);
+}
+
+/* ===== Lista de turmas ===== */
+.lista-turmas-selecao {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card-turma-selecao {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  background: #ffffff;
+  border: 1px solid #e8eef8;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: #1a1a2e;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  transition: box-shadow 0.2s, transform 0.15s;
+  text-align: left;
+}
+
+.card-turma-selecao svg:first-child { color: #1a3a8f; flex-shrink: 0; }
+.card-turma-selecao .seta { color: #94a3b8; margin-left: auto; }
+
+.card-turma-selecao:hover {
+  border-color: #1a3a8f;
+  box-shadow: 0 4px 16px rgba(26,58,143,0.12);
+  transform: translateY(-1px);
+}
+
+/* ===== Lista de alunos ===== */
+.lista-alunos-selecao {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card-aluno-selecao {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 20px;
+  background: #ffffff;
+  border: 1px solid #e8eef8;
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  transition: box-shadow 0.2s, transform 0.15s;
+  text-align: left;
+}
+
+.card-aluno-selecao:hover {
+  border-color: #1a3a8f;
+  box-shadow: 0 4px 16px rgba(26,58,143,0.12);
+  transform: translateY(-1px);
+}
+
+.aluno-avatar {
+  width: 42px;
+  height: 42px;
+  background: #eef2ff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a3a8f;
+  flex-shrink: 0;
+}
+
+.aluno-info { flex: 1; }
+
+.aluno-nome {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin: 0 0 3px 0;
+}
+
+.aluno-matricula {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.card-aluno-selecao .seta { color: #94a3b8; }
+
+/* ===== Formulário de nota ===== */
+.form-nota {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #e8eef8;
+  padding: 24px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  max-width: 480px;
+}
+
+.btn-salvar-nota {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px;
+  background: #1a3a8f;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  margin-top: 4px;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.btn-salvar-nota:hover {
+  background: #1f47b0;
+  transform: translateY(-1px);
+}
+
+/* ===== Separador ===== */
+.separador {
+  border: none;
+  border-top: 1px solid #e8eef8;
+  margin: 4px 0;
+}
+
+/* ===== Form nota professor (versão limpa) ===== */
+.form-nota {
+  max-width: 560px;
+}
+
+/* ============================================================
+   notas.css — Visual melhorado da página de notas do professor
+   ============================================================ */
+
+.notas-prof-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 12px 0;
+}
+
+.notas-prof-card {
+  background: #ffffff;
+  border-radius: 18px;
+  border: 1px solid #e8eef8;
+  box-shadow: 0 4px 24px rgba(26,58,143,0.08);
+  padding: 32px;
+  width: 100%;
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.notas-prof-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e8eef8;
+  color: #1a3a8f;
+}
+
+.notas-prof-titulo {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0 0 3px 0;
+}
+
+.notas-prof-subtitulo {
+  font-size: 0.82rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.notas-prof-secao-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #1a3a8f;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.notas-prof-divisor {
+  border: none;
+  border-top: 1px solid #e8eef8;
+  margin: 4px 0;
+}
+
+.notas-prof-linha {
+  display: flex;
+  gap: 12px;
+}
+
+.notas-prof-linha .campo-grupo { flex: 1; }
+
+.campo-nota { max-width: 110px; }
+
+.campo-input-nota {
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a3a8f;
+}
+
+.btn-salvar-nota-prof {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 14px;
+  background: #1a3a8f;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  margin-top: 4px;
+  transition: background 0.2s, transform 0.15s;
+  box-shadow: 0 4px 16px rgba(26,58,143,0.25);
+}
+
+.btn-salvar-nota-prof:hover {
+  background: #1f47b0;
+  transform: translateY(-1px);
+}
+
+/* campos dentro do card */
+.notas-prof-card .campo-input,
+.notas-prof-card .campo-select {
+  padding: 11px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  color: #1a1a2e;
+  background: #f8faff;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.notas-prof-card .campo-input:focus,
+.notas-prof-card .campo-select:focus {
+  border-color: #1a3a8f;
+  background: #ffffff;
+}
+
+.notas-prof-card .campo-input:disabled,
+.notas-prof-card .campo-select:disabled {
+  background: #f1f5f9;
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.notas-prof-card .campo-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.notas-prof-card .campo-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ============================================================
+   notas.css — Visual centralizado aluno
+   ============================================================ */
+
+.notas-aluno-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.notas-aluno-wrapper .abas {
+  align-self: flex-start;
+}
+
+.lista-meses-aluno {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 700px;
+}
+
+.lista-ultimas-aluno {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 700px;
+}
+
+.card-mes-aluno {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: #ffffff;
+  border-radius: 12px;
+  text-decoration: none;
+  color: #1a1a2e;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  border: 1px solid #e8eef8;
+  transition: box-shadow 0.2s, transform 0.15s, border-color 0.2s;
+}
+
+.card-mes-aluno:hover {
+  box-shadow: 0 4px 16px rgba(26,58,143,0.12);
+  border-color: #c7d2fe;
+  transform: translateY(-1px);
+}
+
+.card-mes-aluno .card-mes-esquerda {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.card-mes-aluno .icone-mes { color: #1a3a8f; opacity: 0.7; }
+.card-mes-aluno .nome-mes  { font-size: 0.95rem; font-weight: 500; color: #1a1a2e; }
+
+.card-mes-aluno .card-mes-direita {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.qtd-notas-badge {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #1a3a8f;
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+  border-radius: 20px;
+  padding: 3px 10px;
+}
+
+.card-mes-aluno .seta { color: #94a3b8; }
+
+/* ===== Card nota aluno ===== */
+.card-nota-aluno {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e8eef8;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.card-nota-aluno .card-nota-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.card-nota-aluno .nota-nome {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+.card-nota-aluno .nota-data {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.8rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.card-nota-aluno .nota-data svg { fill: #94a3b8; }
+
+.card-nota-aluno .card-nota-valor {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.card-nota-aluno .valor {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #1a3a8f;
+}
+
+.card-nota-aluno small {
+  font-size: 0.68rem;
+  color: #94a3b8;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}

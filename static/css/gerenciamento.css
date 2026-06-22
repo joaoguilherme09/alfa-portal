@@ -1,0 +1,399 @@
+/* ============================================================
+   gerenciamento.css — Alfa Profissionalizantes
+   ============================================================ */
+
+.gerenciamento-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 900px;
+}
+
+/* ===== Abas ===== */
+.abas {
+  display: flex;
+  gap: 8px;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 6px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  width: fit-content;
+}
+
+.aba {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #64748b;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+.aba:hover { background: #f0f4ff; color: #1a3a8f; }
+.aba.ativa { background: #1a3a8f; color: #ffffff; }
+.oculto    { display: none; }
+
+/* ===== Topo da seção ===== */
+.secao-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.secao-titulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+.btn-cadastrar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: #1a3a8f;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  transition: background 0.2s;
+}
+
+.btn-cadastrar:hover { background: #1f47b0; }
+
+/* ===== Grid de cursos ===== */
+.grid-cursos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.card-curso-ger {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 24px 16px;
+  background: #ffffff;
+  border: 1px solid #e8eef8;
+  border-radius: 14px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1a1a2e;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.card-curso-ger svg { color: #1a3a8f; }
+
+/* ===== Lista genérica ===== */
+.lista-ger {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card-ger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e8eef8;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.card-ger-esquerda {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.card-ger-info { display: flex; flex-direction: column; gap: 2px; }
+
+.card-ger-titulo {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+.card-ger-sub {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.card-ger-acoes {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-acao {
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: none;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  transition: opacity 0.2s;
+}
+
+.btn-acao:hover { opacity: 0.8; }
+.btn-acao.editar   { background: #eef2ff; color: #1a3a8f; }
+.btn-acao.matricula { background: #f0fdf4; color: #16a34a; }
+
+/* ===== Avatar ===== */
+.aluno-avatar {
+  width: 42px;
+  height: 42px;
+  background: #eef2ff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a3a8f;
+  flex-shrink: 0;
+}
+
+/* ===== Filtro alunos ===== */
+.filtro-alunos {
+  display: flex;
+  gap: 12px;
+}
+
+.filtro-alunos .campo-select {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  color: #1a1a2e;
+  background: #ffffff;
+  outline: none;
+}
+
+/* ===== Modal ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 200;
+}
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #ffffff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 540px;
+  z-index: 201;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid #e8eef8;
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 1;
+}
+
+.modal-header h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+.modal-fechar {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #94a3b8;
+  font-size: 1.1rem;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.modal-fechar:hover { background: #f0f4ff; color: #1a3a8f; }
+
+.modal-corpo {
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.secao-grupo {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #1a3a8f;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 6px 0 0 0;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #e8eef8;
+}
+
+.campo-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.campos-linha {
+  display: flex;
+  gap: 12px;
+}
+
+.campos-linha .campo-grupo { flex: 1; }
+
+.campo-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.campo-input,
+.campo-select {
+  padding: 10px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  color: #1a1a2e;
+  background: #ffffff;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.campo-input:focus,
+.campo-select:focus { border-color: #1a3a8f; }
+
+.campo-upload {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border: 2px dashed #d1d5db;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #64748b;
+  font-size: 0.85rem;
+  transition: border-color 0.2s;
+}
+
+.campo-upload:hover { border-color: #1a3a8f; color: #1a3a8f; }
+
+/* Dias da semana */
+.dias-semana {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.dia-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.dia-btn:has(input:checked) {
+  background: #eef2ff;
+  border-color: #1a3a8f;
+  color: #1a3a8f;
+  font-weight: 600;
+}
+
+/* Modal rodapé */
+.modal-rodape {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 24px 20px;
+  border-top: 1px solid #e8eef8;
+  position: sticky;
+  bottom: 0;
+  background: #fff;
+}
+
+.btn-cancelar {
+  padding: 10px 18px;
+  background: transparent;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  color: #64748b;
+  cursor: pointer;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+.btn-cancelar:hover { background: #f8faff; }
+
+.btn-enviar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  background: #1a3a8f;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  transition: background 0.2s;
+}
+
+.btn-enviar:hover { background: #1f47b0; }
+
+.btn-matricula {
+  padding: 10px 18px;
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #86efac;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  transition: background 0.2s;
+}
+
+.btn-matricula:hover { background: #dcfce7; }
+
+@media (max-width: 600px) {
+  .abas { width: 100%; flex-wrap: wrap; }
+  .campos-linha { flex-direction: column; }
+  .filtro-alunos { flex-direction: column; }
+}
