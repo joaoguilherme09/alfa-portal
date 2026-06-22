@@ -11,13 +11,11 @@
 
 <div class="home-wrapper">
 
-  <!-- Saudação -->
   <div class="saudacao">
     <h2>Bem-vindo, {{ session.nome.split()[0] if session.nome else 'Professor' }}! 👋</h2>
     <p>Aqui está o resumo de hoje.</p>
   </div>
 
-  <!-- Cards de resumo -->
   <div class="resumo-grid">
 
     <div class="resumo-card">
@@ -27,20 +25,8 @@
         </svg>
       </div>
       <div class="resumo-info">
-        <span class="resumo-numero">3</span>
-        <span class="resumo-label">Turmas hoje</span>
-      </div>
-    </div>
-
-    <div class="resumo-card">
-      <div class="resumo-icone laranja">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
-          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
-        </svg>
-      </div>
-      <div class="resumo-info">
-        <span class="resumo-numero">2</span>
-        <span class="resumo-label">Chamadas pendentes</span>
+        <span class="resumo-numero">{{ total_turmas }}</span>
+        <span class="resumo-label">Turmas no total</span>
       </div>
     </div>
 
@@ -51,7 +37,7 @@
         </svg>
       </div>
       <div class="resumo-info">
-        <span class="resumo-numero">4</span>
+        <span class="resumo-numero">{{ notas_hoje }}</span>
         <span class="resumo-label">Notas lançadas hoje</span>
       </div>
     </div>
@@ -63,43 +49,42 @@
         </svg>
       </div>
       <div class="resumo-info">
-        <span class="resumo-numero">1</span>
-        <span class="resumo-label">Comunicado enviado</span>
+        <span class="resumo-numero">{{ comunicados_hoje }}</span>
+        <span class="resumo-label">Comunicados hoje</span>
+      </div>
+    </div>
+
+    <div class="resumo-card">
+      <div class="resumo-icone laranja">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+          <path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1h-2zm3 18H5V8h14v11z"/>
+        </svg>
+      </div>
+      <div class="resumo-info">
+        <span class="resumo-numero">{{ turmas_hoje | length }}</span>
+        <span class="resumo-label">Turmas hoje</span>
       </div>
     </div>
 
   </div>
 
-  <!-- Turmas de hoje -->
   <div class="turmas-hoje">
     <h3 class="secao-titulo">Turmas de hoje</h3>
+    {% if turmas_hoje %}
     <div class="lista-turmas-hoje">
-
+      {% for turma in turmas_hoje %}
       <div class="card-turma-hoje">
         <div class="turma-cor azul"></div>
         <div class="turma-info">
-          <p class="turma-nome">Informática</p>
-          <p class="turma-horario">Segunda e Quarta — 19h às 20h</p>
+          <p class="turma-nome">{{ turma.curso }}</p>
+          <p class="turma-horario">{{ turma.dias_semana }} — {{ turma.horario }}</p>
         </div>
       </div>
-
-      <div class="card-turma-hoje">
-        <div class="turma-cor verde"></div>
-        <div class="turma-info">
-          <p class="turma-nome">ENEM</p>
-          <p class="turma-horario">Terça e Quinta — 14h às 16h</p>
-        </div>
-      </div>
-
-      <div class="card-turma-hoje">
-        <div class="turma-cor laranja"></div>
-        <div class="turma-info">
-          <p class="turma-nome">Inglês</p>
-          <p class="turma-horario">Sábado — 09h às 11h</p>
-        </div>
-      </div>
-
+      {% endfor %}
     </div>
+    {% else %}
+    <p style="color:#64748b; font-size:0.9rem;">Nenhuma turma hoje.</p>
+    {% endif %}
   </div>
 
 </div>

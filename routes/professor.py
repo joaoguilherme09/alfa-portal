@@ -1,6 +1,19 @@
 from flask import Blueprint, render_template, session, redirect, url_for
+from db import create_connection, get_cursor
+from datetime import date
 
 professor_bp = Blueprint('professor', __name__, url_prefix='/professor')
+
+NOMES_MESES = {
+    1: 'Janeiro', 2: 'Fevereiro', 3: 'Março', 4: 'Abril',
+    5: 'Maio', 6: 'Junho', 7: 'Julho', 8: 'Agosto',
+    9: 'Setembro', 10: 'Outubro', 11: 'Novembro', 12: 'Dezembro'
+}
+
+DIAS_PT = {
+    'Monday': 'Segunda', 'Tuesday': 'Terça', 'Wednesday': 'Quarta',
+    'Thursday': 'Quinta', 'Friday': 'Sexta', 'Saturday': 'Sábado', 'Sunday': 'Domingo'
+}
 
 def login_required(f):
     from functools import wraps
@@ -14,24 +27,419 @@ def login_required(f):
 @professor_bp.route('/home')
 @login_required
 def home():
-    return render_template('professor/home.html')
+    professor_id = session['id']
+    hoje = date.today()
+    dia_semana_en = hoje.strftime('%A')
+    dia_semana_pt = DIAS_PT.get(dia_semana_en, '')
+
+    conn = create_connection()
+    cur  = get_cursor(conn)
+
+    # Turmas do professor
+    cur.execute("""
+        SELECT t.id, t.nome, t.dias_semana, t.horario, c.nome as curso
+        FROM portal_turmas t
+        JOIN portal_cursos c ON c.id = t.curso_id
+        WHERE t.professor_id = %s
+    """, (professor_id,))
+    todas_turmas = cur.fetchall()
+
+    # Turmas de hoje
+    turmas_hoje = [t for t in todas_turmas if dia_semana_pt in t['dias_semana']]
+
+    # Total de notas lançadas hoje
+    cur.execute("""
+        SELECT COUNT(*) as qtd FROM portal_notas
+        WHERE professor_id = %s AND DATE(criado_em) = %s
+    """, (professor_id, hoje))
+    notas_hoje = cur.fetchone()['qtd']
+
+    # Total de comunicados enviados hoje
+    cur.execute("""
+        SELECT COUNT(*) as qtd FROM portal_comunicados
+        WHERE professor_id = %s AND DATE(criado_em) = %s
+    """, (professor_id, hoje))
+    comunicados_hoje = cur.fetchone()['qtd']
+
+    cur.close()
+    conn.close()
+
+    return render_template('professor/home.html',
+        turmas_hoje=turmas_hoje,
+        total_turmas=len(todas_turmas),
+        notas_hoje=notas_hoje,
+        comunicados_hoje=comunicados_hoje
+    )
 
 @professor_bp.route('/notas')
 @login_required
 def notas():
-    return render_template('professor/notas/notas.html')
+    professor_id = session['id']
+    conn = create_connection()
+    cur  = get_cursor(conn)
+
+    cur.execute("""
+        SELECT t.id, t.nome, c.nome as curso
+        FROM portal_turmas t
+        JOIN portal_cursos c ON c.id = t.curso_id
+        WHERE t.professor_id = %s
+    """, (professor_id,))
+    turmas = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    return render_template('professor/notas/notas.html',
+        turmas=turmas,
+        nomes_meses=NOMES_MESES
+    )
 
 @professor_bp.route('/faltas')
 @login_required
 def faltas():
-    return render_template('professor/faltas/faltas.html')
+    professor_id = session['id']
+    conn = create_connection()
+    cur  = get_cursor(conn)
+
+    cur.execute("""
+        SELECT t.id, t.nome, t.dias_semana, t.horario, c.nome as curso
+        FROM portal_turmas t
+        JOIN portal_cursos c ON c.id = t.curso_id
+        WHERE t.professor_id = %s
+    """, (professor_id,))
+    turmas = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    return render_template('professor/faltas/faltas.html', turmas=turmas)
+
+@professor_bp.route('/faltas/alunos/<int:turma_id>')
+@login_required
+def faltas_alunos(turma_id):
+    professor_id = session['id']
+    hoje = date.today()
+
+    conn = create_connection()
+    cur  = get_cursor(conn)
+
+    # Dados da turma
+    cur.execute("""
+        SELECT t.nome, t.horario, c.nome as curso
+        FROM portal_turmas t
+        JOIN portal_cursos c ON c.id = t.curso_id
+        WHERE t.id = %s
+    """, (turma_id,))
+    turma = cur.fetchone()
+
+    # Alunos da turma
+    cur.execute("""
+        SELECT a.id, a.nome, a.foto,
+            (SELECT COUNT(*) FROM portal_chamadas
+             WHERE aluno_id = a.id AND turma_id = %s
+             AND status = 'F' AND MONTH(data_aula) = MONTH(NOW())) as faltas_mes
+        FROM portal_aluno_turma at2
+        JOIN portal_alunos a ON a.id = at2.aluno_id
+        WHERE at2.turma_id = %s
+    """, (turma_id, turma_id))
+    alunos = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    return render_template('professor/faltas/chamada.html',
+        turma=turma,
+        turma_id=turma_id,
+        alunos=alunos,
+        hoje=hoje.strftime('%d/%m/%Y')
+    )
 
 @professor_bp.route('/comunicados')
 @login_required
 def comunicados():
-    return render_template('professor/comunicados/comunicados.html')
+    professor_id = session['id']
+    conn = create_connection()
+    cur  = get_cursor(conn)
+
+    cur.execute("""
+        SELECT titulo, arquivo, tipo, DATE_FORMAT(criado_em, '%%d/%%m/%%Y') as data
+        FROM portal_comunicados
+        WHERE professor_id = %s
+        ORDER BY criado_em DESC
+    """, (professor_id,))
+    comunicados = cur.fetchall()
+
+    cur.execute("""
+        SELECT t.id, t.nome, c.nome as curso
+        FROM portal_turmas t
+        JOIN portal_cursos c ON c.id = t.curso_id
+        WHERE t.professor_id = %s
+    """, (professor_id,))
+    turmas = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    return render_template('professor/comunicados/comunicados.html',
+        comunicados=comunicados,
+        turmas=turmas
+    )
 
 @professor_bp.route('/gerenciamento')
 @login_required
 def gerenciamento():
-    return render_template('professor/gerenciamento/gerenciamento.html')
+    conn = create_connection()
+    cur  = get_cursor(conn)
+
+    cur.execute("SELECT * FROM portal_cursos")
+    cursos = cur.fetchall()
+
+    cur.execute("""
+        SELECT t.*, c.nome as curso, p.nome as professor
+        FROM portal_turmas t
+        JOIN portal_cursos c ON c.id = t.curso_id
+        JOIN portal_professores p ON p.id = t.professor_id
+    """)
+    turmas = cur.fetchall()
+
+    cur.execute("SELECT id, nome, matricula, cargo FROM portal_professores")
+    professores = cur.fetchall()
+
+    cur.execute("""
+        SELECT a.id, a.nome, a.matricula,
+            MAX(c.nome) as curso
+        FROM portal_alunos a
+        LEFT JOIN portal_aluno_turma at2 ON at2.aluno_id = a.id
+        LEFT JOIN portal_turmas t ON t.id = at2.turma_id
+        LEFT JOIN portal_cursos c ON c.id = t.curso_id
+        GROUP BY a.id, a.nome, a.matricula
+    """)
+    alunos = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    return render_template('professor/gerenciamento/gerenciamento.html',
+        cursos=cursos,
+        turmas=turmas,
+        professores=professores,
+        alunos=alunos
+    )
+
+from flask import jsonify, request as flask_request
+import datetime
+
+@professor_bp.route('/alunos_turma/<int:turma_id>')
+@login_required
+def alunos_turma(turma_id):
+    conn = create_connection()
+    cur  = get_cursor(conn)
+    cur.execute("""
+        SELECT a.id, a.nome
+        FROM portal_aluno_turma at2
+        JOIN portal_alunos a ON a.id = at2.aluno_id
+        WHERE at2.turma_id = %s
+        ORDER BY a.nome
+    """, (turma_id,))
+    alunos = cur.fetchall()
+    cur.close()
+    conn.close()
+    return jsonify(alunos)
+
+@professor_bp.route('/salvar_nota', methods=['POST'])
+@login_required
+def salvar_nota():
+    professor_id = session['id']
+    data = flask_request.get_json()
+
+    try:
+        conn = create_connection()
+        cur  = get_cursor(conn)
+        cur.execute("""
+            INSERT INTO portal_notas
+            (aluno_id, turma_id, professor_id, nome_atividade, mes, ano, valor)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+        """, (
+            data['aluno_id'],
+            data['turma_id'],
+            professor_id,
+            data['atividade'],
+            data['mes'],
+            datetime.date.today().year,
+            data['nota']
+        ))
+        conn.commit()
+        cur.close()
+        conn.close()
+        return jsonify({'ok': True})
+    except Exception as e:
+        return jsonify({'ok': False, 'erro': str(e)})
+
+@professor_bp.route('/salvar_chamada', methods=['POST'])
+@login_required
+def salvar_chamada():
+    professor_id = session['id']
+    data = flask_request.get_json()
+    turma_id = data['turma_id']
+    status_alunos = data['status']
+    hoje = datetime.date.today()
+
+    try:
+        conn = create_connection()
+        cur  = get_cursor(conn)
+        for aluno_id, status in status_alunos.items():
+            cur.execute("""
+                INSERT INTO portal_chamadas
+                (aluno_id, turma_id, professor_id, data_aula, status)
+                VALUES (%s, %s, %s, %s, %s)
+                ON DUPLICATE KEY UPDATE status = VALUES(status)
+            """, (aluno_id, turma_id, professor_id, hoje, status))
+        conn.commit()
+        cur.close()
+        conn.close()
+        return jsonify({'ok': True})
+    except Exception as e:
+        return jsonify({'ok': False, 'erro': str(e)})
+
+import os
+from werkzeug.utils import secure_filename
+
+UPLOAD_FOLDER = 'static/uploads/comunicados'
+ALLOWED_EXTENSIONS = {'pdf', 'docx'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@professor_bp.route('/salvar_comunicado', methods=['POST'])
+@login_required
+def salvar_comunicado():
+    from flask import current_app
+    professor_id = session['id']
+    titulo    = flask_request.form.get('titulo')
+    tipo      = flask_request.form.get('tipo')
+    turma_id  = flask_request.form.get('turma_id') or None
+    aluno_id  = flask_request.form.get('aluno_id') or None
+    arquivo   = flask_request.files.get('arquivo')
+
+    if arquivo and allowed_file(arquivo.filename):
+        filename = secure_filename(arquivo.filename)
+        os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+        arquivo.save(os.path.join(UPLOAD_FOLDER, filename))
+
+        conn = create_connection()
+        cur  = get_cursor(conn)
+        cur.execute("""
+            INSERT INTO portal_comunicados
+            (professor_id, titulo, arquivo, tipo, turma_id, aluno_id)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """, (professor_id, titulo, filename, tipo, turma_id, aluno_id))
+        conn.commit()
+        cur.close()
+        conn.close()
+
+    return redirect(url_for('professor.comunicados'))
+
+@professor_bp.route('/salvar_turma', methods=['POST'])
+@login_required
+def salvar_turma():
+    nome         = flask_request.form.get('nome')
+    curso_id     = flask_request.form.get('curso_id')
+    professor_id = flask_request.form.get('professor_id')
+    dias         = ','.join(flask_request.form.getlist('dias'))
+    horario      = flask_request.form.get('horario')
+    periodo      = flask_request.form.get('periodo')
+
+    conn = create_connection()
+    cur  = get_cursor(conn)
+    cur.execute("""
+        INSERT INTO portal_turmas (nome, curso_id, professor_id, dias_semana, horario, periodo)
+        VALUES (%s, %s, %s, %s, %s, %s)
+    """, (nome, curso_id, professor_id, dias, horario, periodo))
+    conn.commit()
+    cur.close()
+    conn.close()
+    return redirect(url_for('professor.gerenciamento'))
+
+@professor_bp.route('/salvar_professor', methods=['POST'])
+@login_required
+def salvar_professor():
+    nome      = flask_request.form.get('nome')
+    matricula = flask_request.form.get('matricula')
+    senha     = flask_request.form.get('senha')
+    cargo     = flask_request.form.get('cargo')
+
+    conn = create_connection()
+    cur  = get_cursor(conn)
+    cur.execute("""
+        INSERT INTO portal_professores (nome, matricula, senha, cargo)
+        VALUES (%s, %s, %s, %s)
+    """, (nome, matricula, senha, cargo))
+    conn.commit()
+    cur.close()
+    conn.close()
+    return redirect(url_for('professor.gerenciamento'))
+
+@professor_bp.route('/salvar_aluno', methods=['POST'])
+@login_required
+def salvar_aluno():
+    f = flask_request.form
+
+    # Gerar matrícula automática
+    conn = create_connection()
+    cur  = get_cursor(conn)
+    cur.execute("SELECT MAX(CAST(matricula AS UNSIGNED)) as max_mat FROM portal_alunos")
+    resultado = cur.fetchone()
+    nova_matricula = str((resultado['max_mat'] or 50240000) + 1)
+
+    cur.execute("""
+        INSERT INTO portal_alunos (
+            nome_responsavel, nascimento_responsavel, cpf_responsavel,
+            rg_responsavel, telefone_responsavel,
+            nome, nascimento, endereco, bairro, numero, cidade, cep,
+            matricula, senha, periodo
+        ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+    """, (
+        f['nome_responsavel'], f['nascimento_responsavel'], f['cpf_responsavel'],
+        f['rg_responsavel'], f['telefone_responsavel'],
+        f['nome'], f['nascimento'], f['endereco'], f['bairro'],
+        f['numero'], f['cidade'], f['cep'],
+        nova_matricula, f['senha'], f['periodo']
+    ))
+    aluno_id = cur.lastrowid
+
+    # Vincular à turma
+    if f.get('turma_id'):
+        cur.execute("""
+            INSERT INTO portal_aluno_turma (aluno_id, turma_id)
+            VALUES (%s, %s)
+        """, (aluno_id, f['turma_id']))
+
+    conn.commit()
+    cur.close()
+    conn.close()
+    return redirect(url_for('professor.gerenciamento'))
+
+@professor_bp.route('/salvar_matricula', methods=['POST'])
+@login_required
+def salvar_matricula():
+    f = flask_request.form
+
+    conn = create_connection()
+    cur  = get_cursor(conn)
+
+    # Próximo número de contrato
+    cur.execute("SELECT MAX(numero_contrato) as max_num FROM portal_matriculas_contratos")
+    resultado = cur.fetchone()
+    numero_contrato = (resultado['max_num'] or 0) + 1
+
+    cur.execute("""
+        INSERT INTO portal_matriculas_contratos (
+            aluno_id, numero_contrato, data_matricula, data_primeiro_pagamento,
+            curso_contrato, modulo, preco_total, qtd_parcelas,
+            parcelas_extenso, valor_parcela, dia_horario
+        ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+    """, (
+        f['aluno_id'], numero_contrato, datetime.date.today(),
+        f['data_primeiro_pagamento'], f['curso_contrato'], f['modulo'],
+        f['preco_total'], f['qtd_parcelas'], f['parcelas_extenso'],
+        f['valor_parcela'], f['dia_horario']
+    ))
+    conn.commit()
+    cur.close()
+    conn.close()
+    return redirect(url_for('professor.gerenciamento'))

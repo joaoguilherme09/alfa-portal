@@ -25,13 +25,12 @@
       <h3 class="secao-titulo">Cursos cadastrados</h3>
     </div>
     <div class="grid-cursos">
-      {% set cursos = ['Informática', 'Inglês', 'ENEM', 'Embraer', 'Reforço', 'Alfabetização'] %}
       {% for curso in cursos %}
       <div class="card-curso-ger">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="28" height="28">
           <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/>
         </svg>
-        <span>{{ curso }}</span>
+        <span>{{ curso.nome }}</span>
       </div>
       {% endfor %}
     </div>
@@ -44,22 +43,21 @@
       <button class="btn-cadastrar" onclick="abrirModal('modal-turma')">+ Nova Turma</button>
     </div>
     <div class="lista-ger">
-      {% set turmas = [
-        ('Segunda e Quarta 19h às 20h', 'Informática', 'Pierre Souza'),
-        ('Terça e Quinta 14h às 16h',   'ENEM',        'Pierre Souza'),
-        ('Sábado 09h às 11h',           'Inglês',      'Pierre Souza'),
-      ] %}
-      {% for nome, curso, prof in turmas %}
-      <div class="card-ger">
-        <div class="card-ger-info">
-          <p class="card-ger-titulo">{{ nome }}</p>
-          <p class="card-ger-sub">{{ curso }} — {{ prof }}</p>
+      {% if turmas %}
+        {% for turma in turmas %}
+        <div class="card-ger">
+          <div class="card-ger-info">
+            <p class="card-ger-titulo">{{ turma.nome }}</p>
+            <p class="card-ger-sub">{{ turma.curso }} — {{ turma.professor }}</p>
+          </div>
+          <div class="card-ger-acoes">
+            <button class="btn-acao editar">Editar</button>
+          </div>
         </div>
-        <div class="card-ger-acoes">
-          <button class="btn-acao editar">Editar</button>
-        </div>
-      </div>
-      {% endfor %}
+        {% endfor %}
+      {% else %}
+        <p class="vazio">Nenhuma turma cadastrada.</p>
+      {% endif %}
     </div>
   </div>
 
@@ -70,24 +68,24 @@
       <button class="btn-cadastrar" onclick="abrirModal('modal-professor')">+ Novo Professor</button>
     </div>
     <div class="lista-ger">
-      {% set professores = [
-        ('Pierre Souza', 'prof01', 'Informática, ENEM, Inglês'),
-      ] %}
-      {% for nome, matricula, cursos in professores %}
-      <div class="card-ger">
-        <div class="card-ger-esquerda">
-          <div class="aluno-avatar">{{ nome[0] }}</div>
-          <div class="card-ger-info">
-            <p class="card-ger-titulo">{{ nome }}</p>
-            <p class="card-ger-sub">Matrícula: {{ matricula }}</p>
-            <p class="card-ger-sub">{{ cursos }}</p>
+      {% if professores %}
+        {% for prof in professores %}
+        <div class="card-ger">
+          <div class="card-ger-esquerda">
+            <div class="aluno-avatar">{{ prof.nome[0] }}</div>
+            <div class="card-ger-info">
+              <p class="card-ger-titulo">{{ prof.nome }}</p>
+              <p class="card-ger-sub">Matrícula: {{ prof.matricula }} — {{ prof.cargo | capitalize }}</p>
+            </div>
+          </div>
+          <div class="card-ger-acoes">
+            <button class="btn-acao editar">Editar</button>
           </div>
         </div>
-        <div class="card-ger-acoes">
-          <button class="btn-acao editar">Editar</button>
-        </div>
-      </div>
-      {% endfor %}
+        {% endfor %}
+      {% else %}
+        <p class="vazio">Nenhum professor cadastrado.</p>
+      {% endif %}
     </div>
   </div>
 
@@ -98,43 +96,26 @@
       <button class="btn-cadastrar" onclick="abrirModal('modal-aluno')">+ Cadastrar Aluno</button>
     </div>
 
-    <!-- Filtro -->
-    <div class="filtro-alunos">
-      <select class="campo-select" id="filtro-curso">
-        <option value="">Todos os cursos</option>
-        <option>Informática</option><option>Inglês</option><option>ENEM</option>
-        <option>Embraer</option><option>Reforço</option><option>Alfabetização</option>
-      </select>
-      <select class="campo-select" id="filtro-turma">
-        <option value="">Todas as turmas</option>
-        <option>Segunda e Quarta 19h às 20h</option>
-        <option>Terça e Quinta 14h às 16h</option>
-        <option>Sábado 09h às 11h</option>
-      </select>
-    </div>
-
     <div class="lista-ger">
-      {% set alunos = [
-        ('João Guilherme P. Mendes', '50240371', 'Informática'),
-        ('Maria Clara Silva',        '50240372', 'ENEM'),
-        ('Pedro Henrique Souza',     '50240373', 'Inglês'),
-        ('Lucas Oliveira',           '50240374', 'Informática'),
-      ] %}
-      {% for nome, matricula, curso in alunos %}
-      <div class="card-ger">
-        <div class="card-ger-esquerda">
-          <div class="aluno-avatar">{{ nome[0] }}</div>
-          <div class="card-ger-info">
-            <p class="card-ger-titulo">{{ nome }}</p>
-            <p class="card-ger-sub">Matrícula: {{ matricula }} — {{ curso }}</p>
+      {% if alunos %}
+        {% for aluno in alunos %}
+        <div class="card-ger">
+          <div class="card-ger-esquerda">
+            <div class="aluno-avatar">{{ aluno.nome[0] }}</div>
+            <div class="card-ger-info">
+              <p class="card-ger-titulo">{{ aluno.nome }}</p>
+              <p class="card-ger-sub">Matrícula: {{ aluno.matricula }}{% if aluno.curso %} — {{ aluno.curso }}{% endif %}</p>
+            </div>
+          </div>
+          <div class="card-ger-acoes">
+            <button class="btn-acao editar">Editar</button>
+            <button class="btn-acao matricula" onclick="abrirModalMatricula({{ aluno.id }}, '{{ aluno.nome }}')">Matrícula</button>
           </div>
         </div>
-        <div class="card-ger-acoes">
-          <button class="btn-acao editar">Editar</button>
-          <button class="btn-acao matricula" onclick="abrirModal('modal-aluno')">Matrícula</button>
-        </div>
-      </div>
-      {% endfor %}
+        {% endfor %}
+      {% else %}
+        <p class="vazio">Nenhum aluno cadastrado.</p>
+      {% endif %}
     </div>
   </div>
 
@@ -147,45 +128,55 @@
     <h3>Nova Turma</h3>
     <button class="modal-fechar" onclick="fecharModal('modal-turma')">✕</button>
   </div>
-  <div class="modal-corpo">
-    <div class="campo-grupo">
-      <label class="campo-label">Nome da turma</label>
-      <input type="text" class="campo-input" placeholder="Ex: Terça e Quinta 14h às 16h"/>
-    </div>
-    <div class="campo-grupo">
-      <label class="campo-label">Curso</label>
-      <select class="campo-select">
-        <option>Informática</option><option>Inglês</option><option>ENEM</option>
-        <option>Embraer</option><option>Reforço</option><option>Alfabetização</option>
-      </select>
-    </div>
-    <div class="campo-grupo">
-      <label class="campo-label">Professor</label>
-      <select class="campo-select"><option>Pierre Souza</option></select>
-    </div>
-    <div class="campo-grupo">
-      <label class="campo-label">Dias da semana</label>
-      <div class="dias-semana">
-        {% for dia in ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'] %}
-        <label class="dia-btn"><input type="checkbox" value="{{ dia }}"/> {{ dia }}</label>
-        {% endfor %}
+  <form action="/professor/salvar_turma" method="POST">
+    <div class="modal-corpo">
+      <div class="campo-grupo">
+        <label class="campo-label">Nome da turma</label>
+        <input type="text" class="campo-input" name="nome" placeholder="Ex: Terça e Quinta 14h às 16h" required/>
+      </div>
+      <div class="campo-grupo">
+        <label class="campo-label">Curso</label>
+        <select class="campo-select" name="curso_id" required>
+          <option value="">Selecione o curso</option>
+          {% for curso in cursos %}
+          <option value="{{ curso.id }}">{{ curso.nome }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="campo-grupo">
+        <label class="campo-label">Professor</label>
+        <select class="campo-select" name="professor_id" required>
+          {% for prof in professores %}
+          <option value="{{ prof.id }}">{{ prof.nome }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="campo-grupo">
+        <label class="campo-label">Dias da semana</label>
+        <div class="dias-semana">
+          {% for dia in ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'] %}
+          <label class="dia-btn"><input type="checkbox" name="dias" value="{{ dia }}"/> {{ dia }}</label>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="campo-grupo">
+        <label class="campo-label">Horário</label>
+        <input type="text" class="campo-input" name="horario" placeholder="Ex: 14h às 16h" required/>
+      </div>
+      <div class="campo-grupo">
+        <label class="campo-label">Período</label>
+        <select class="campo-select" name="periodo" required>
+          <option value="Manhã">Manhã</option>
+          <option value="Tarde">Tarde</option>
+          <option value="Noite">Noite</option>
+        </select>
       </div>
     </div>
-    <div class="campo-grupo">
-      <label class="campo-label">Horário</label>
-      <input type="text" class="campo-input" placeholder="Ex: 14h às 16h"/>
+    <div class="modal-rodape">
+      <button type="button" class="btn-cancelar" onclick="fecharModal('modal-turma')">Cancelar</button>
+      <button type="submit" class="btn-enviar">Salvar</button>
     </div>
-    <div class="campo-grupo">
-      <label class="campo-label">Período</label>
-      <select class="campo-select">
-        <option>Manhã</option><option>Tarde</option><option>Noite</option>
-      </select>
-    </div>
-  </div>
-  <div class="modal-rodape">
-    <button class="btn-cancelar" onclick="fecharModal('modal-turma')">Cancelar</button>
-    <button class="btn-enviar">Salvar</button>
-  </div>
+  </form>
 </div>
 
 <!-- ===== MODAL NOVO PROFESSOR ===== -->
@@ -195,40 +186,33 @@
     <h3>Novo Professor</h3>
     <button class="modal-fechar" onclick="fecharModal('modal-professor')">✕</button>
   </div>
-  <div class="modal-corpo">
-    <div class="campo-grupo">
-      <label class="campo-label">Nome</label>
-      <input type="text" class="campo-input" placeholder="Nome completo"/>
+  <form action="/professor/salvar_professor" method="POST" enctype="multipart/form-data">
+    <div class="modal-corpo">
+      <div class="campo-grupo">
+        <label class="campo-label">Nome</label>
+        <input type="text" class="campo-input" name="nome" placeholder="Nome completo" required/>
+      </div>
+      <div class="campo-grupo">
+        <label class="campo-label">Matrícula</label>
+        <input type="text" class="campo-input" name="matricula" placeholder="Ex: prof02" required/>
+      </div>
+      <div class="campo-grupo">
+        <label class="campo-label">Senha</label>
+        <input type="password" class="campo-input" name="senha" placeholder="Senha de acesso" required/>
+      </div>
+      <div class="campo-grupo">
+        <label class="campo-label">Cargo</label>
+        <select class="campo-select" name="cargo">
+          <option value="professor">Professor</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
     </div>
-    <div class="campo-grupo">
-      <label class="campo-label">Matrícula</label>
-      <input type="text" class="campo-input" placeholder="Ex: prof02"/>
+    <div class="modal-rodape">
+      <button type="button" class="btn-cancelar" onclick="fecharModal('modal-professor')">Cancelar</button>
+      <button type="submit" class="btn-enviar">Salvar</button>
     </div>
-    <div class="campo-grupo">
-      <label class="campo-label">Senha</label>
-      <input type="password" class="campo-input" placeholder="Senha de acesso"/>
-    </div>
-    <div class="campo-grupo">
-      <label class="campo-label">Cargo</label>
-      <select class="campo-select">
-        <option>Professor</option><option>Admin</option>
-      </select>
-    </div>
-    <div class="campo-grupo">
-      <label class="campo-label">Foto</label>
-      <label class="campo-upload">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
-          <path d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
-        </svg>
-        <span>Selecionar foto</span>
-        <input type="file" accept="image/*" style="display:none"/>
-      </label>
-    </div>
-  </div>
-  <div class="modal-rodape">
-    <button class="btn-cancelar" onclick="fecharModal('modal-professor')">Cancelar</button>
-    <button class="btn-enviar">Salvar</button>
-  </div>
+  </form>
 </div>
 
 <!-- ===== MODAL CADASTRAR ALUNO ===== -->
@@ -238,165 +222,157 @@
     <h3>Cadastrar Aluno</h3>
     <button class="modal-fechar" onclick="fecharModal('modal-aluno')">✕</button>
   </div>
-  <div class="modal-corpo">
+  <form action="/professor/salvar_aluno" method="POST" enctype="multipart/form-data">
+    <div class="modal-corpo">
 
-    <p class="secao-grupo">Dados do Responsável</p>
-    <div class="campo-grupo">
-      <label class="campo-label">Nome do responsável</label>
-      <input type="text" class="campo-input" placeholder="Nome completo"/>
-    </div>
-    <div class="campos-linha">
+      <p class="secao-grupo">Dados do Responsável</p>
+      <div class="campo-grupo">
+        <label class="campo-label">Nome do responsável</label>
+        <input type="text" class="campo-input" name="nome_responsavel" placeholder="Nome completo" required/>
+      </div>
+      <div class="campos-linha">
+        <div class="campo-grupo">
+          <label class="campo-label">Nascimento</label>
+          <input type="date" class="campo-input" name="nascimento_responsavel" required/>
+        </div>
+        <div class="campo-grupo">
+          <label class="campo-label">CPF</label>
+          <input type="text" class="campo-input" name="cpf_responsavel" placeholder="000.000.000-00" required/>
+        </div>
+      </div>
+      <div class="campos-linha">
+        <div class="campo-grupo">
+          <label class="campo-label">RG</label>
+          <input type="text" class="campo-input" name="rg_responsavel" placeholder="00.000.000-0" required/>
+        </div>
+        <div class="campo-grupo">
+          <label class="campo-label">Telefone</label>
+          <input type="text" class="campo-input" name="telefone_responsavel" placeholder="(12) 00000-0000" required/>
+        </div>
+      </div>
+
+      <p class="secao-grupo">Dados do Aluno</p>
+      <div class="campo-grupo">
+        <label class="campo-label">Nome do aluno</label>
+        <input type="text" class="campo-input" name="nome" placeholder="Nome completo" required/>
+      </div>
       <div class="campo-grupo">
         <label class="campo-label">Nascimento</label>
-        <input type="date" class="campo-input"/>
+        <input type="date" class="campo-input" name="nascimento" required/>
       </div>
       <div class="campo-grupo">
-        <label class="campo-label">CPF</label>
-        <input type="text" class="campo-input" placeholder="000.000.000-00"/>
+        <label class="campo-label">Endereço</label>
+        <input type="text" class="campo-input" name="endereco" placeholder="Rua, Avenida..." required/>
       </div>
-    </div>
-    <div class="campos-linha">
-      <div class="campo-grupo">
-        <label class="campo-label">RG</label>
-        <input type="text" class="campo-input" placeholder="00.000.000-0"/>
+      <div class="campos-linha">
+        <div class="campo-grupo">
+          <label class="campo-label">Número</label>
+          <input type="text" class="campo-input" name="numero" placeholder="Nº" required/>
+        </div>
+        <div class="campo-grupo">
+          <label class="campo-label">Bairro</label>
+          <input type="text" class="campo-input" name="bairro" placeholder="Bairro" required/>
+        </div>
       </div>
-      <div class="campo-grupo">
-        <label class="campo-label">Telefone</label>
-        <input type="text" class="campo-input" placeholder="(12) 00000-0000"/>
+      <div class="campos-linha">
+        <div class="campo-grupo">
+          <label class="campo-label">Cidade</label>
+          <input type="text" class="campo-input" name="cidade" value="São José dos Campos"/>
+        </div>
+        <div class="campo-grupo">
+          <label class="campo-label">CEP</label>
+          <input type="text" class="campo-input" name="cep" placeholder="00000-000" required/>
+        </div>
       </div>
-    </div>
 
-    <p class="secao-grupo">Dados do Aluno</p>
-    <div class="campo-grupo">
-      <label class="campo-label">Nome do aluno</label>
-      <input type="text" class="campo-input" placeholder="Nome completo"/>
-    </div>
-    <div class="campo-grupo">
-      <label class="campo-label">Nascimento</label>
-      <input type="date" class="campo-input"/>
-    </div>
-    <div class="campo-grupo">
-      <label class="campo-label">Endereço</label>
-      <input type="text" class="campo-input" placeholder="Rua, Avenida..."/>
-    </div>
-    <div class="campos-linha">
+      <p class="secao-grupo">Dados Acadêmicos</p>
       <div class="campo-grupo">
-        <label class="campo-label">Número</label>
-        <input type="text" class="campo-input" placeholder="Nº"/>
+        <label class="campo-label">Turma</label>
+        <select class="campo-select" name="turma_id" required>
+          <option value="">Selecione a turma</option>
+          {% for turma in turmas %}
+          <option value="{{ turma.id }}">{{ turma.curso }} — {{ turma.nome }}</option>
+          {% endfor %}
+        </select>
       </div>
       <div class="campo-grupo">
-        <label class="campo-label">Bairro</label>
-        <input type="text" class="campo-input" placeholder="Bairro"/>
-      </div>
-    </div>
-    <div class="campos-linha">
-      <div class="campo-grupo">
-        <label class="campo-label">Cidade</label>
-        <input type="text" class="campo-input" value="São José dos Campos"/>
+        <label class="campo-label">Período</label>
+        <select class="campo-select" name="periodo" required>
+          <option value="Manhã">Manhã</option>
+          <option value="Tarde">Tarde</option>
+          <option value="Noite">Noite</option>
+        </select>
       </div>
       <div class="campo-grupo">
-        <label class="campo-label">CEP</label>
-        <input type="text" class="campo-input" placeholder="00000-000"/>
+        <label class="campo-label">Senha</label>
+        <input type="text" class="campo-input" name="senha" placeholder="Senha de acesso" required/>
       </div>
-    </div>
 
-    <p class="secao-grupo">Dados Acadêmicos</p>
-    <div class="campo-grupo">
-      <label class="campo-label">Curso</label>
-      <select class="campo-select">
-        <option value="">Selecione o curso</option>
-        <option>Informática</option><option>Inglês</option><option>ENEM</option>
-        <option>Embraer</option><option>Reforço</option><option>Alfabetização</option>
-      </select>
     </div>
-    <div class="campo-grupo">
-      <label class="campo-label">Turma</label>
-      <select class="campo-select">
-        <option value="">Selecione a turma</option>
-        <option>Segunda e Quarta 19h às 20h</option>
-        <option>Terça e Quinta 14h às 16h</option>
-        <option>Sábado 09h às 11h</option>
-      </select>
+    <div class="modal-rodape">
+      <button type="button" class="btn-cancelar" onclick="fecharModal('modal-aluno')">Cancelar</button>
+      <button type="submit" class="btn-enviar">Salvar</button>
     </div>
-    <div class="campo-grupo">
-      <label class="campo-label">Período</label>
-      <select class="campo-select">
-        <option>Manhã</option><option>Tarde</option><option>Noite</option>
-      </select>
-    </div>
-    <div class="campo-grupo">
-      <label class="campo-label">Foto do aluno</label>
-      <label class="campo-upload">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
-          <path d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
-        </svg>
-        <span>Selecionar foto</span>
-        <input type="file" accept="image/*" style="display:none"/>
-      </label>
-    </div>
-
-  </div>
-  <div class="modal-rodape">
-    <button class="btn-cancelar" onclick="fecharModal('modal-aluno')">Cancelar</button>
-    <button class="btn-matricula" onclick="abrirModal('modal-matricula')">Fazer Matrícula</button>
-    <button class="btn-enviar">Salvar</button>
-  </div>
+  </form>
 </div>
 
 <!-- ===== MODAL MATRÍCULA ===== -->
 <div class="modal-overlay oculto" id="overlay-modal-matricula" onclick="fecharModal('modal-matricula')"></div>
 <div class="modal oculto" id="modal-matricula">
   <div class="modal-header">
-    <h3>Fazer Matrícula</h3>
+    <h3>Fazer Matrícula — <span id="nome-aluno-matricula"></span></h3>
     <button class="modal-fechar" onclick="fecharModal('modal-matricula')">✕</button>
   </div>
-  <div class="modal-corpo">
-    <div class="campo-grupo">
-      <label class="campo-label">Curso / Matéria</label>
-      <input type="text" class="campo-input" placeholder="Ex: Reforço Escolar"/>
-    </div>
-    <div class="campo-grupo">
-      <label class="campo-label">Módulo</label>
-      <input type="text" class="campo-input" placeholder="Ex: Português – Matemática"/>
-    </div>
-    <div class="campos-linha">
+  <form action="/professor/salvar_matricula" method="POST">
+    <input type="hidden" name="aluno_id" id="input-aluno-id-matricula"/>
+    <div class="modal-corpo">
       <div class="campo-grupo">
-        <label class="campo-label">Preço total</label>
-        <input type="text" class="campo-input" placeholder="Ex: R$ 1.200,00"/>
+        <label class="campo-label">Curso / Matéria</label>
+        <input type="text" class="campo-input" name="curso_contrato" placeholder="Ex: Reforço Escolar" required/>
       </div>
       <div class="campo-grupo">
-        <label class="campo-label">Nº de parcelas</label>
-        <input type="number" class="campo-input" placeholder="Ex: 12"/>
+        <label class="campo-label">Módulo</label>
+        <input type="text" class="campo-input" name="modulo" placeholder="Ex: Português – Matemática" required/>
       </div>
-    </div>
-    <div class="campos-linha">
+      <div class="campos-linha">
+        <div class="campo-grupo">
+          <label class="campo-label">Preço total</label>
+          <input type="text" class="campo-input" name="preco_total" placeholder="Ex: 1200.00" required/>
+        </div>
+        <div class="campo-grupo">
+          <label class="campo-label">Nº de parcelas</label>
+          <input type="number" class="campo-input" name="qtd_parcelas" placeholder="Ex: 12" required/>
+        </div>
+      </div>
+      <div class="campos-linha">
+        <div class="campo-grupo">
+          <label class="campo-label">Parcelas por extenso</label>
+          <input type="text" class="campo-input" name="parcelas_extenso" placeholder="Ex: DOZE" required/>
+        </div>
+        <div class="campo-grupo">
+          <label class="campo-label">Valor da parcela</label>
+          <input type="text" class="campo-input" name="valor_parcela" placeholder="Ex: 100.00" required/>
+        </div>
+      </div>
       <div class="campo-grupo">
-        <label class="campo-label">Parcelas por extenso</label>
-        <input type="text" class="campo-input" placeholder="Ex: DOZE"/>
+        <label class="campo-label">Data do 1º pagamento</label>
+        <input type="date" class="campo-input" name="data_primeiro_pagamento" required/>
       </div>
       <div class="campo-grupo">
-        <label class="campo-label">Valor da parcela</label>
-        <input type="text" class="campo-input" placeholder="Ex: R$ 100,00"/>
+        <label class="campo-label">Dia e horário</label>
+        <input type="text" class="campo-input" name="dia_horario" placeholder="Ex: Terça e Quinta 14h às 16h" required/>
       </div>
     </div>
-    <div class="campo-grupo">
-      <label class="campo-label">Data do 1º pagamento</label>
-      <input type="date" class="campo-input"/>
+    <div class="modal-rodape">
+      <button type="button" class="btn-cancelar" onclick="fecharModal('modal-matricula')">Cancelar</button>
+      <button type="submit" class="btn-enviar">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+          <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+        </svg>
+        Gerar Contrato PDF
+      </button>
     </div>
-    <div class="campo-grupo">
-      <label class="campo-label">Dia e horário</label>
-      <input type="text" class="campo-input" placeholder="Ex: Terça e Quinta 14h às 16h"/>
-    </div>
-  </div>
-  <div class="modal-rodape">
-    <button class="btn-cancelar" onclick="fecharModal('modal-matricula')">Cancelar</button>
-    <button class="btn-enviar">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-      </svg>
-      Gerar Contrato PDF
-    </button>
-  </div>
+  </form>
 </div>
 
 {% endblock %}
@@ -418,6 +394,12 @@ function abrirModal(id) {
 function fecharModal(id) {
   document.getElementById('overlay-' + id).classList.add('oculto');
   document.getElementById(id).classList.add('oculto');
+}
+
+function abrirModalMatricula(alunoId, nomeAluno) {
+  document.getElementById('input-aluno-id-matricula').value = alunoId;
+  document.getElementById('nome-aluno-matricula').textContent = nomeAluno;
+  abrirModal('modal-matricula');
 }
 </script>
 {% endblock %}
