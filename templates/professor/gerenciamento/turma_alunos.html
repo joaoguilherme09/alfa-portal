@@ -1,0 +1,55 @@
+{% extends "professor/base_professor.html" %}
+
+{% block titulo %}{{ turma.turma }} — Alunos{% endblock %}
+{% block pagina_titulo %}Gerenciamento{% endblock %}
+
+{% block estilo %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/gerenciamento.css') }}">
+{% endblock %}
+
+{% block conteudo %}
+
+<div class="gerenciamento-wrapper">
+
+  <a href="javascript:history.back()" class="btn-voltar">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+      <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+    </svg>
+    Voltar
+  </a>
+
+  <div class="secao-topo">
+    <h3 class="secao-titulo">
+      {{ turma.curso }} — {{ turma.turma }}
+    </h3>
+    <span class="badge-alunos">{{ alunos|length }} aluno{% if alunos|length != 1 %}s{% endif %}</span>
+  </div>
+
+  <div class="lista-ger">
+    {% if alunos %}
+      {% for aluno in alunos %}
+      <div class="card-ger">
+        <div class="card-ger-esquerda">
+          <div class="aluno-avatar">{{ aluno.nome[0] }}</div>
+          <div class="card-ger-info">
+            <p class="card-ger-titulo">{{ aluno.nome }}</p>
+            <p class="card-ger-sub">
+              Matrícula: {{ aluno.matricula }} — {{ aluno.periodo }}
+            </p>
+          </div>
+        </div>
+        <div class="card-ger-acoes">
+          {% if aluno.faltas_mes > 0 %}
+          <span class="badge-faltas">{{ aluno.faltas_mes }} falta{% if aluno.faltas_mes != 1 %}s{% endif %} no mês</span>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <p class="vazio">Nenhum aluno nesta turma.</p>
+    {% endif %}
+  </div>
+
+</div>
+
+{% endblock %}

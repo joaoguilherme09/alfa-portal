@@ -592,3 +592,78 @@
   font-size: 0.85rem;
   color: #64748b;
 }
+
+/* ===== Calendário de chamadas ===== */
+.calendario-dias {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 8px 0;
+}
+
+.dia-chamada {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 12px;
+  border: 2px solid #e8eef8;
+  background: #ffffff;
+  cursor: pointer;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  transition: transform 0.15s, box-shadow 0.15s;
+  gap: 2px;
+}
+
+.dia-chamada:hover:not(.futuro) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(26,58,143,0.15);
+}
+
+.dia-numero {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  line-height: 1;
+}
+
+.dia-semana {
+  font-size: 0.68rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dia-status {
+  font-size: 0.75rem;
+}
+
+.dia-chamada.feita {
+  border-color: #86efac;
+  background: #f0fdf4;
+}
+
+.dia-chamada.feita .dia-numero { color: #16a34a; }
+
+.dia-chamada.hoje {
+  border-color: #1a3a8f;
+  background: #eef2ff;
+}
+
+.dia-chamada.hoje .dia-numero { color: #1a3a8f; }
+
+.dia-chamada.pendente {
+  border-color: #fca5a5;
+  background: #fff8f8;
+}
+
+.dia-chamada.pendente .dia-numero { color: #dc2626; }
+
+.dia-chamada.futuro {
+  border-color: #e8eef8;
+  background: #f8faff;
+  opacity: 0.5;
+  cursor: not-allowed;
+}

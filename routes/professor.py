@@ -172,7 +172,7 @@ def comunicados():
     cur  = get_cursor(conn)
 
     cur.execute("""
-        SELECT titulo, arquivo, tipo, DATE_FORMAT(criado_em, '%%d/%%m/%%Y') as data
+        SELECT titulo, arquivo, tipo, DATE_FORMAT(criado_em, '%d/%m/%Y') as data
         FROM portal_comunicados
         WHERE professor_id = %s
         ORDER BY criado_em DESC
@@ -290,7 +290,7 @@ def salvar_chamada():
     data = flask_request.get_json()
     turma_id = data['turma_id']
     status_alunos = data['status']
-    hoje = datetime.date.today()
+    hoje = data['data']
 
     try:
         conn = create_connection()
@@ -606,3 +606,100 @@ def editar_turma():
     cur.close()
     conn.close()
     return redirect(url_for('professor.gerenciamento'))
+
+
+# Adicione essas rotas no routes/professor.py
+
+@professor_bp.route('/chamadas_mes/<int:turma_id>/<int:ano>/<int:mes>')
+@login_required
+def chamadas_mes(turma_id, ano, mes):
+    conn = create_connection()
+    cur  = get_cursor(conn)
+    cur.execute("""
+        SELECT DISTINCT DATE_FORMAT(data_aula, '%Y-%m-%d') as data_aula
+        FROM portal_chamadas
+        WHERE turma_id = %s
+          AND YEAR(data_aula) = %s
+          AND MONTH(data_aula) = %s
+    """, (turma_id, ano, mes))
+    chamadas = cur.fetchall()
+    cur.close()
+    conn.close()
+    return jsonify(chamadas)
+
+@professor_bp.route('/alunos_chamada/<int:turma_id>/<string:data>')
+@login_required
+def alunos_chamada(turma_id, data):
+    conn = create_connection()
+    cur  = get_cursor(conn)
+    cur.execute("""
+        SELECT a.id, a.nome,
+            COALESCE(
+                (SELECT status FROM portal_chamadas
+                 WHERE aluno_id = a.id AND turma_id = %s AND data_aula = %s),
+                'P'
+            ) as status,
+            (SELECT COUNT(*) FROM portal_chamadas
+             WHERE aluno_id = a.id AND turma_id = %s
+             AND status = 'F' AND MONTH(data_aula) = MONTH(%s)) as faltas_mes
+        FROM portal_aluno_turma at2
+        JOIN portal_alunos a ON a.id = at2.aluno_id
+        WHERE at2.turma_id = %s
+        ORDER BY a.nome
+    """, (turma_id, data, turma_id, data, turma_id))
+    alunos = cur.fetchall()
+    cur.close()
+    conn.close()
+    return jsonify(alunos)
+
+
+# Adicione essas rotas no routes/professor.py
+
+@professor_bp.route('/curso/<int:curso_id>/turmas')
+@admin_required
+def curso_turmas(curso_id):
+    conn = create_connection()
+    cur  = get_cursor(conn)
+    cur.execute("SELECT nome FROM portal_cursos WHERE id = %s", (curso_id,))
+    curso = cur.fetchone()
+    cur.execute("""
+        SELECT t.id, t.nome, t.dias_semana, t.horario, t.periodo,
+               p.nome as professor,
+               (SELECT COUNT(*) FROM portal_aluno_turma WHERE turma_id = t.id) as total_alunos
+        FROM portal_turmas t
+        JOIN portal_professores p ON p.id = t.professor_id
+        WHERE t.curso_id = %s
+    """, (curso_id,))
+    turmas = cur.fetchall()
+    cur.close()
+    conn.close()
+    return render_template('professor/gerenciamento/curso_turmas.html',
+        curso=curso, turmas=turmas, curso_id=curso_id)
+
+@professor_bp.route('/turma/<int:turma_id>/alunos')
+@admin_required
+def turma_alunos(turma_id):
+    conn = create_connection()
+    cur  = get_cursor(conn)
+    cur.execute("""
+        SELECT t.nome as turma, c.nome as curso
+        FROM portal_turmas t
+        JOIN portal_cursos c ON c.id = t.curso_id
+        WHERE t.id = %s
+    """, (turma_id,))
+    turma = cur.fetchone()
+    cur.execute("""
+        SELECT a.id, a.nome, a.matricula, a.periodo,
+               (SELECT COUNT(*) FROM portal_chamadas
+                WHERE aluno_id = a.id AND turma_id = %s
+                AND status = 'F' AND MONTH(data_aula) = MONTH(NOW())) as faltas_mes
+        FROM portal_aluno_turma at2
+        JOIN portal_alunos a ON a.id = at2.aluno_id
+        WHERE at2.turma_id = %s
+        ORDER BY a.nome
+    """, (turma_id, turma_id))
+    alunos = cur.fetchall()
+    cur.close()
+    conn.close()
+    return render_template('professor/gerenciamento/turma_alunos.html',
+        turma=turma, alunos=alunos, turma_id=turma_id)

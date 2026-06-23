@@ -1,0 +1,53 @@
+{% extends "professor/base_professor.html" %}
+
+{% block titulo %}{{ curso.nome }} — Turmas{% endblock %}
+{% block pagina_titulo %}Gerenciamento{% endblock %}
+
+{% block estilo %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/gerenciamento.css') }}">
+{% endblock %}
+
+{% block conteudo %}
+
+<div class="gerenciamento-wrapper">
+
+  <a href="{{ url_for('professor.gerenciamento') }}" class="btn-voltar">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+      <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+    </svg>
+    Voltar ao Gerenciamento
+  </a>
+
+  <div class="secao-topo">
+    <h3 class="secao-titulo">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="22" height="22" style="color:#1a3a8f">
+        <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/>
+      </svg>
+      {{ curso.nome }} — Turmas
+    </h3>
+  </div>
+
+  <div class="lista-ger">
+    {% if turmas %}
+      {% for turma in turmas %}
+      <a href="{{ url_for('professor.turma_alunos', turma_id=turma.id) }}" class="card-ger card-ger-link">
+        <div class="card-ger-info">
+          <p class="card-ger-titulo">{{ turma.nome }}</p>
+          <p class="card-ger-sub">{{ turma.professor }} — {{ turma.dias_semana }} {{ turma.horario }}</p>
+        </div>
+        <div class="card-ger-acoes">
+          <span class="badge-alunos">{{ turma.total_alunos }} aluno{% if turma.total_alunos != 1 %}s{% endif %}</span>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18" style="color:#94a3b8">
+            <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+          </svg>
+        </div>
+      </a>
+      {% endfor %}
+    {% else %}
+      <p class="vazio">Nenhuma turma neste curso.</p>
+    {% endif %}
+  </div>
+
+</div>
+
+{% endblock %}

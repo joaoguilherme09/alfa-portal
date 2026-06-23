@@ -10,15 +10,16 @@
 {% block conteudo %}
 
 <div class="faltas-prof-wrapper">
-  <div class="faltas-prof-card" id="card-selecao">
 
+  <!-- Card de seleção de turma -->
+  <div class="faltas-prof-card" id="card-selecao">
     <div class="notas-prof-header">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="28" height="28">
         <path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1h-2zm3 18H5V8h14v11z"/>
       </svg>
       <div>
-        <h2 class="notas-prof-titulo">Fazer Chamada</h2>
-        <p class="notas-prof-subtitulo">Selecione a turma para iniciar a chamada</p>
+        <h2 class="notas-prof-titulo">Chamadas</h2>
+        <p class="notas-prof-subtitulo">Selecione a turma para ver o calendário de chamadas</p>
       </div>
     </div>
 
@@ -29,41 +30,60 @@
       <select class="campo-select" id="select-turma-falta">
         <option value="">Selecione a turma</option>
         {% for turma in turmas %}
-        <option value="{{ turma.id }}">{{ turma.curso }} — {{ turma.nome }}</option>
+        <option value="{{ turma.id }}" data-dias="{{ turma.dias_semana }}">
+          {{ turma.curso }} — {{ turma.nome }}
+        </option>
         {% endfor %}
       </select>
     </div>
 
-    <button class="btn-salvar-nota-prof" onclick="abrirChamada()">
+    <button class="btn-salvar-nota-prof" onclick="abrirCalendario()">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
         <path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1h-2zm3 18H5V8h14v11z"/>
       </svg>
-      Abrir Chamada
+      Ver Calendário
     </button>
-
   </div>
 
-  <!-- Card de chamada -->
-  <div class="faltas-prof-card oculto" id="card-chamada">
-
+  <!-- Card do calendário -->
+  <div class="faltas-prof-card oculto" id="card-calendario">
     <div class="chamada-header">
       <div>
-        <h3 class="chamada-titulo">Chamada do dia</h3>
-        <p class="chamada-data" id="chamada-data"></p>
+        <h3 class="chamada-titulo" id="cal-titulo">Calendário de Chamadas</h3>
+        <p class="chamada-data" id="cal-subtitulo"></p>
       </div>
-      <span class="chamada-turma-label" id="chamada-turma-label"></span>
+      <button class="btn-voltar-chamada" onclick="voltarSelecao()">← Voltar</button>
+    </div>
+
+    <p class="chamada-instrucao">
+      <span style="color:#16a34a">● Chamada feita</span> &nbsp;
+      <span style="color:#1a3a8f">● Hoje</span> &nbsp;
+      <span style="color:#94a3b8">● Sem chamada</span>
+    </p>
+
+    <div class="calendario-dias" id="calendario-dias">
+      <!-- dias gerados por JS -->
+    </div>
+  </div>
+
+  <!-- Card de chamada do dia -->
+  <div class="faltas-prof-card oculto" id="card-chamada">
+    <div class="chamada-header">
+      <div>
+        <h3 class="chamada-titulo">Chamada</h3>
+        <p class="chamada-data" id="chamada-data-label"></p>
+      </div>
+      <button class="btn-voltar-chamada" onclick="voltarCalendario()">← Voltar</button>
     </div>
 
     <p class="chamada-instrucao">Todos começam como ✅ Presente. Clique para marcar falta.</p>
 
-    <div class="lista-alunos-chamada" id="lista-alunos">
-      <!-- alunos carregados via JS -->
-    </div>
+    <div class="lista-alunos-chamada" id="lista-alunos"></div>
 
     <div id="msg-chamada" style="display:none; padding:10px; border-radius:8px; font-size:0.88rem; text-align:center; margin-top:8px;"></div>
 
     <div class="chamada-rodape">
-      <button class="btn-voltar-chamada" onclick="voltarSelecao()">← Voltar</button>
+      <button class="btn-voltar-chamada" onclick="voltarCalendario()">← Voltar</button>
       <button class="btn-salvar-nota-prof" onclick="salvarChamada()">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
           <path d="M17 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7l-4-4zm-5 16a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm3-10H5V5h10v4z"/>
@@ -71,112 +91,12 @@
         Salvar Chamada
       </button>
     </div>
-
   </div>
+
 </div>
 
 {% endblock %}
 
 {% block script %}
-<script>
-let turmaSelecionadaId = null;
-let statusAlunos = {};
-
-function abrirChamada() {
-  const select = document.getElementById('select-turma-falta');
-  turmaSelecionadaId = select.value;
-  const turmaLabel = select.options[select.selectedIndex].text;
-
-  if (!turmaSelecionadaId) {
-    alert('Selecione uma turma!');
-    return;
-  }
-
-  const hoje = new Date();
-  document.getElementById('chamada-data').textContent =
-    hoje.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' });
-  document.getElementById('chamada-turma-label').textContent = turmaLabel;
-
-  // Carregar alunos da turma
-  fetch(`/professor/alunos_turma/${turmaSelecionadaId}`)
-    .then(r => r.json())
-    .then(alunos => {
-      const lista = document.getElementById('lista-alunos');
-      lista.innerHTML = '';
-      statusAlunos = {};
-
-      alunos.forEach((a, i) => {
-        statusAlunos[a.id] = 'P';
-        lista.innerHTML += `
-          <div class="card-chamada" id="card-${a.id}">
-            <div class="chamada-aluno-info">
-              <div class="aluno-avatar">${a.nome[0]}</div>
-              <div>
-                <p class="aluno-nome">${a.nome}</p>
-                <p class="aluno-faltas-mes">${a.faltas_mes} falta${a.faltas_mes !== 1 ? 's' : ''} no mês</p>
-              </div>
-            </div>
-            <button class="btn-status presente" id="btn-${a.id}" onclick="toggleStatus(${a.id})">
-              <span class="status-icone">✅</span>
-              <span class="status-texto">Presente</span>
-            </button>
-          </div>`;
-      });
-
-      document.getElementById('card-selecao').classList.add('oculto');
-      document.getElementById('card-chamada').classList.remove('oculto');
-    });
-}
-
-function toggleStatus(id) {
-  const btn  = document.getElementById('btn-' + id);
-  const card = document.getElementById('card-' + id);
-
-  if (statusAlunos[id] === 'P') {
-    statusAlunos[id] = 'F';
-    btn.className = 'btn-status falta';
-    btn.querySelector('.status-icone').textContent = '❌';
-    btn.querySelector('.status-texto').textContent = 'Falta';
-    card.classList.add('card-falta-ativo');
-  } else {
-    statusAlunos[id] = 'P';
-    btn.className = 'btn-status presente';
-    btn.querySelector('.status-icone').textContent = '✅';
-    btn.querySelector('.status-texto').textContent = 'Presente';
-    card.classList.remove('card-falta-ativo');
-  }
-}
-
-function salvarChamada() {
-  const msg = document.getElementById('msg-chamada');
-
-  fetch('/professor/salvar_chamada', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      turma_id: turmaSelecionadaId,
-      status: statusAlunos
-    })
-  })
-  .then(r => r.json())
-  .then(data => {
-    msg.style.display = 'block';
-    if (data.ok) {
-      msg.style.background = '#dcfce7';
-      msg.style.color = '#16a34a';
-      msg.textContent = '✅ Chamada salva com sucesso!';
-    } else {
-      msg.style.background = '#fee2e2';
-      msg.style.color = '#dc2626';
-      msg.textContent = 'Erro ao salvar chamada.';
-    }
-    setTimeout(() => msg.style.display = 'none', 3000);
-  });
-}
-
-function voltarSelecao() {
-  document.getElementById('card-chamada').classList.add('oculto');
-  document.getElementById('card-selecao').classList.remove('oculto');
-}
-</script>
+<script src="{{ url_for('static', filename='js/chamada.js') }}"></script>
 {% endblock %}

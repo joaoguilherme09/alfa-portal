@@ -26,12 +26,12 @@
     </div>
     <div class="grid-cursos">
       {% for curso in cursos %}
-      <div class="card-curso-ger">
+      <a href="{{ url_for('professor.curso_turmas', curso_id=curso.id) }}" class="card-curso-ger">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="28" height="28">
           <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/>
         </svg>
         <span>{{ curso.nome }}</span>
-      </div>
+      </a>
       {% endfor %}
     </div>
   </div>
