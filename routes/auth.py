@@ -10,9 +10,6 @@ def login_aluno():
         senha     = request.form.get('senha')
 
         conn = create_connection()
-
-        print("CONN:", conn)
-
         cur  = get_cursor(conn)
         cur.execute("""
             SELECT id, nome, matricula, senha, periodo, foto
@@ -22,17 +19,19 @@ def login_aluno():
         aluno = cur.fetchone()
 
         if aluno and aluno['senha'] == senha:
+            # Buscar TODOS os cursos do aluno
             cur.execute("""
-                SELECT c.nome as curso
+                SELECT DISTINCT c.nome as curso
                 FROM portal_aluno_turma at2
                 JOIN portal_turmas t ON t.id = at2.turma_id
                 JOIN portal_cursos c ON c.id = t.curso_id
                 WHERE at2.aluno_id = %s
-                LIMIT 1
             """, (aluno['id'],))
-            turma_info = cur.fetchone()
+            cursos_raw = cur.fetchall()
             cur.close()
             conn.close()
+
+            cursos_str = ' + '.join([c['curso'] for c in cursos_raw]) if cursos_raw else '—'
 
             session['perfil']    = 'aluno'
             session['id']        = aluno['id']
@@ -40,7 +39,7 @@ def login_aluno():
             session['matricula'] = aluno['matricula']
             session['periodo']   = aluno['periodo']
             session['foto']      = aluno['foto']
-            session['curso']     = turma_info['curso'] if turma_info else '—'
+            session['curso']     = cursos_str
             return redirect(url_for('aluno.home'))
         else:
             cur.close()

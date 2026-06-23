@@ -31,7 +31,6 @@ def notas():
     conn = create_connection()
     cur  = get_cursor(conn)
 
-    # Contar notas por mês
     cur.execute("""
         SELECT mes, COUNT(*) as qtd
         FROM portal_notas
@@ -40,7 +39,6 @@ def notas():
     """, (aluno_id,))
     notas_por_mes_raw = cur.fetchall()
 
-    # Últimas notas
     cur.execute("""
         SELECT nome_atividade, mes, ano, valor,
                DATE_FORMAT(criado_em, '%d/%m/%Y') as data
@@ -93,7 +91,6 @@ def faltas():
     conn = create_connection()
     cur  = get_cursor(conn)
 
-    # Contar faltas por mês
     cur.execute("""
         SELECT MONTH(data_aula) as mes, COUNT(*) as qtd
         FROM portal_chamadas
@@ -102,7 +99,6 @@ def faltas():
     """, (aluno_id,))
     faltas_por_mes_raw = cur.fetchall()
 
-    # Detalhes de cada falta
     cur.execute("""
         SELECT MONTH(data_aula) as mes,
                DATE_FORMAT(data_aula, '%d/%m/%Y') as data,
@@ -138,13 +134,30 @@ def comentarios():
 
     conn = create_connection()
     cur  = get_cursor(conn)
+
+    # Buscar turmas do aluno
     cur.execute("""
-        SELECT titulo, arquivo, DATE_FORMAT(criado_em, '%d/%m/%Y') as data
-        FROM portal_comunicados
-        WHERE tipo = 'turma'
-           OR (tipo = 'aluno' AND aluno_id = %s)
-        ORDER BY criado_em DESC
+        SELECT turma_id FROM portal_aluno_turma WHERE aluno_id = %s
     """, (aluno_id,))
+    turmas = [t['turma_id'] for t in cur.fetchall()]
+
+    if turmas:
+        formato = ','.join(['%s'] * len(turmas))
+        cur.execute(f"""
+            SELECT titulo, arquivo, DATE_FORMAT(criado_em, '%d/%m/%Y') as data
+            FROM portal_comunicados
+            WHERE (tipo = 'turma' AND turma_id IN ({formato}))
+               OR (tipo = 'aluno' AND aluno_id = %s)
+            ORDER BY criado_em DESC
+        """, (*turmas, aluno_id))
+    else:
+        cur.execute("""
+            SELECT titulo, arquivo, DATE_FORMAT(criado_em, '%d/%m/%Y') as data
+            FROM portal_comunicados
+            WHERE tipo = 'aluno' AND aluno_id = %s
+            ORDER BY criado_em DESC
+        """, (aluno_id,))
+
     comunicados = cur.fetchall()
     cur.close()
     conn.close()

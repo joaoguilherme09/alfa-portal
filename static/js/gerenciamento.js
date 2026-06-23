@@ -85,3 +85,33 @@ function abrirModalEditarTurma(turmaId) {
       abrirModal('modal-editar-turma');
     });
 }
+
+// Atualiza editar aluno para marcar turmas
+function abrirModalEditar(alunoId) {
+  fetch(`/professor/buscar_aluno/${alunoId}`)
+    .then(r => r.json())
+    .then(a => {
+      document.getElementById('edit-aluno-id').value             = a.id;
+      document.getElementById('edit-nome-responsavel').value     = a.nome_responsavel;
+      document.getElementById('edit-nasc-responsavel').value     = a.nascimento_responsavel;
+      document.getElementById('edit-cpf').value                  = a.cpf_responsavel;
+      document.getElementById('edit-rg').value                   = a.rg_responsavel;
+      document.getElementById('edit-telefone').value             = a.telefone_responsavel;
+      document.getElementById('edit-nome-aluno').value           = a.nome;
+      document.getElementById('edit-nasc-aluno').value           = a.nascimento;
+      document.getElementById('edit-endereco').value             = a.endereco;
+      document.getElementById('edit-numero').value               = a.numero;
+      document.getElementById('edit-bairro').value               = a.bairro;
+      document.getElementById('edit-cidade').value               = a.cidade;
+      document.getElementById('edit-cep').value                  = a.cep;
+      document.getElementById('edit-senha').value                = a.senha;
+      document.getElementById('edit-periodo').value              = a.periodo;
+
+      // Marcar turmas
+      document.querySelectorAll('.edit-turma-check').forEach(cb => {
+        cb.checked = a.turmas.includes(parseInt(cb.value));
+      });
+
+      abrirModal('modal-editar-aluno');
+    });
+}

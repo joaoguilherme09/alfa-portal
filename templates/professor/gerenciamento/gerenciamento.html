@@ -385,29 +385,31 @@
           <input type="text" class="campo-input" name="cep" placeholder="00000-000" required/>
         </div>
       </div>
-      <p class="secao-grupo">Dados Acadêmicos</p>
-      <div class="campo-grupo">
-        <label class="campo-label">Turma</label>
-        <select class="campo-select" name="turma_id" required>
-          <option value="">Selecione a turma</option>
-          {% for turma in turmas %}
-          <option value="{{ turma.id }}">{{ turma.curso }} — {{ turma.nome }}</option>
-          {% endfor %}
-        </select>
+      <p class="secao-grupo">Dados Acadêmicos</p>        
+        <div class="campo-grupo">
+          <label class="campo-label">Turmas</label>
+          <div class="turmas-check" id="turmas-check-cadastro">
+            {% for turma in turmas %}
+            <label class="turma-check-item">
+              <input type="checkbox" name="turmas[]" value="{{ turma.id }}"/>
+              {{ turma.curso }} — {{ turma.nome }}
+            </label>
+            {% endfor %}
+          </div>
+        </div>        
+        <div class="campo-grupo">
+          <label class="campo-label">Período</label>
+          <select class="campo-select" name="periodo" required>
+            <option value="Manhã">Manhã</option>
+            <option value="Tarde">Tarde</option>
+            <option value="Noite">Noite</option>
+          </select>
+        </div>        
+        <div class="campo-grupo">
+          <label class="campo-label">Senha</label>
+          <input type="text" class="campo-input" name="senha" placeholder="Senha de acesso" required/>
+        </div>
       </div>
-      <div class="campo-grupo">
-        <label class="campo-label">Período</label>
-        <select class="campo-select" name="periodo" required>
-          <option value="Manhã">Manhã</option>
-          <option value="Tarde">Tarde</option>
-          <option value="Noite">Noite</option>
-        </select>
-      </div>
-      <div class="campo-grupo">
-        <label class="campo-label">Senha</label>
-        <input type="text" class="campo-input" name="senha" placeholder="Senha de acesso" required/>
-      </div>
-    </div>
     <div class="modal-rodape">
       <button type="button" class="btn-cancelar" onclick="fecharModal('modal-aluno')">Cancelar</button>
       <button type="submit" class="btn-enviar">Salvar</button>
@@ -482,17 +484,19 @@
           <label class="campo-label">CEP</label>
           <input type="text" class="campo-input" name="cep" id="edit-cep" required/>
         </div>
-      </div>
-      <p class="secao-grupo">Dados Acadêmicos</p>
+      </div>            
+      <p class="secao-grupo">Dados Acadêmicos</p>      
       <div class="campo-grupo">
-        <label class="campo-label">Turma</label>
-        <select class="campo-select" name="turma_id" id="edit-turma">
-          <option value="">Selecione a turma</option>
+        <label class="campo-label">Turmas</label>
+        <div class="turmas-check" id="turmas-check-edicao">
           {% for turma in turmas %}
-          <option value="{{ turma.id }}">{{ turma.curso }} — {{ turma.nome }}</option>
+          <label class="turma-check-item">
+            <input type="checkbox" name="turmas[]" value="{{ turma.id }}" class="edit-turma-check"/>
+            {{ turma.curso }} — {{ turma.nome }}
+          </label>
           {% endfor %}
-        </select>
-      </div>
+        </div>
+      </div>      
       <div class="campo-grupo">
         <label class="campo-label">Período</label>
         <select class="campo-select" name="periodo" id="edit-periodo">
@@ -500,7 +504,7 @@
           <option value="Tarde">Tarde</option>
           <option value="Noite">Noite</option>
         </select>
-      </div>
+      </div>      
       <div class="campo-grupo">
         <label class="campo-label">Senha</label>
         <input type="text" class="campo-input" name="senha" id="edit-senha" required/>

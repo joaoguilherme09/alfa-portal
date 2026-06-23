@@ -386,19 +386,21 @@ def salvar_professor():
     cur.close()
     conn.close()
     return redirect(url_for('professor.gerenciamento'))
-
+ 
 @professor_bp.route('/salvar_aluno', methods=['POST'])
 @login_required
 def salvar_aluno():
-    f = flask_request.form
-
-    # Gerar matrícula automática
+    f        = flask_request.form
+    turmas   = flask_request.form.getlist('turmas[]')
+ 
     conn = create_connection()
     cur  = get_cursor(conn)
+ 
+    # Gerar matrícula automática
     cur.execute("SELECT MAX(CAST(matricula AS UNSIGNED)) as max_mat FROM portal_alunos")
-    resultado = cur.fetchone()
+    resultado    = cur.fetchone()
     nova_matricula = str((resultado['max_mat'] or 50240000) + 1)
-
+ 
     cur.execute("""
         INSERT INTO portal_alunos (
             nome_responsavel, nascimento_responsavel, cpf_responsavel,
@@ -414,18 +416,19 @@ def salvar_aluno():
         nova_matricula, f['senha'], f['periodo']
     ))
     aluno_id = cur.lastrowid
-
-    # Vincular à turma
-    if f.get('turma_id'):
+ 
+    # Vincular às turmas selecionadas
+    for turma_id in turmas:
         cur.execute("""
             INSERT INTO portal_aluno_turma (aluno_id, turma_id)
             VALUES (%s, %s)
-        """, (aluno_id, f['turma_id']))
-
+        """, (aluno_id, turma_id))
+ 
     conn.commit()
     cur.close()
     conn.close()
     return redirect(url_for('professor.gerenciamento'))
+ 
 
 @professor_bp.route('/salvar_matricula', methods=['POST'])
 @login_required
@@ -456,7 +459,7 @@ def salvar_matricula():
     cur.close()
     conn.close()
     return redirect(url_for('professor.gerenciamento'))
-
+ 
 @professor_bp.route('/buscar_aluno/<int:aluno_id>')
 @login_required
 def buscar_aluno(aluno_id):
@@ -464,47 +467,39 @@ def buscar_aluno(aluno_id):
     cur  = get_cursor(conn)
     cur.execute("SELECT * FROM portal_alunos WHERE id = %s", (aluno_id,))
     aluno = cur.fetchone()
-
-    # Buscar turma do aluno
+ 
+    # Buscar TODAS as turmas do aluno
     cur.execute("""
-        SELECT turma_id FROM portal_aluno_turma WHERE aluno_id = %s LIMIT 1
+        SELECT turma_id FROM portal_aluno_turma WHERE aluno_id = %s
     """, (aluno_id,))
-    turma = cur.fetchone()
+    turmas = [t['turma_id'] for t in cur.fetchall()]
     cur.close()
     conn.close()
-
+ 
     if aluno:
-        # Converter datas para string
-        aluno['nascimento'] = str(aluno['nascimento'])
+        aluno['nascimento']             = str(aluno['nascimento'])
         aluno['nascimento_responsavel'] = str(aluno['nascimento_responsavel'])
-        aluno['turma_id'] = turma['turma_id'] if turma else None
+        aluno['turmas']                 = turmas
         return jsonify(aluno)
     return jsonify({'erro': 'Aluno não encontrado'}), 404
-
+ 
+ 
 @professor_bp.route('/editar_aluno', methods=['POST'])
 @login_required
 def editar_aluno():
-    f = flask_request.form
+    f        = flask_request.form
     aluno_id = f['aluno_id']
-
+    turmas   = flask_request.form.getlist('turmas[]')
+ 
     conn = create_connection()
     cur  = get_cursor(conn)
+ 
     cur.execute("""
         UPDATE portal_alunos SET
-            nome_responsavel = %s,
-            nascimento_responsavel = %s,
-            cpf_responsavel = %s,
-            rg_responsavel = %s,
-            telefone_responsavel = %s,
-            nome = %s,
-            nascimento = %s,
-            endereco = %s,
-            bairro = %s,
-            numero = %s,
-            cidade = %s,
-            cep = %s,
-            periodo = %s,
-            senha = %s
+            nome_responsavel = %s, nascimento_responsavel = %s,
+            cpf_responsavel = %s, rg_responsavel = %s, telefone_responsavel = %s,
+            nome = %s, nascimento = %s, endereco = %s, bairro = %s,
+            numero = %s, cidade = %s, cep = %s, periodo = %s, senha = %s
         WHERE id = %s
     """, (
         f['nome_responsavel'], f['nascimento_responsavel'],
@@ -513,20 +508,20 @@ def editar_aluno():
         f['numero'], f['cidade'], f['cep'], f['periodo'], f['senha'],
         aluno_id
     ))
-
-    # Atualizar turma
-    if f.get('turma_id'):
-        cur.execute("DELETE FROM portal_aluno_turma WHERE aluno_id = %s", (aluno_id,))
+ 
+    # Atualizar turmas — apaga todas e recadastra
+    cur.execute("DELETE FROM portal_aluno_turma WHERE aluno_id = %s", (aluno_id,))
+    for turma_id in turmas:
         cur.execute("""
             INSERT INTO portal_aluno_turma (aluno_id, turma_id)
             VALUES (%s, %s)
-        """, (aluno_id, f['turma_id']))
-
+        """, (aluno_id, turma_id))
+ 
     conn.commit()
     cur.close()
     conn.close()
     return redirect(url_for('professor.gerenciamento'))
-
+ 
 
 @professor_bp.route('/buscar_professor/<int:professor_id>')
 @login_required
