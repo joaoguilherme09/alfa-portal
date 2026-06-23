@@ -43,7 +43,7 @@ def notas():
     # Últimas notas
     cur.execute("""
         SELECT nome_atividade, mes, ano, valor,
-               DATE_FORMAT(criado_em, '%%d/%%m/%%Y') as data
+               DATE_FORMAT(criado_em, '%d/%m/%Y') as data
         FROM portal_notas
         WHERE aluno_id = %s
         ORDER BY criado_em DESC
@@ -71,7 +71,7 @@ def notas_mes(mes):
     cur  = get_cursor(conn)
     cur.execute("""
         SELECT nome_atividade as nome, valor,
-               DATE_FORMAT(criado_em, '%%d/%%m/%%Y') as data
+               DATE_FORMAT(criado_em, '%d/%m/%Y') as data
         FROM portal_notas
         WHERE aluno_id = %s AND mes = %s AND ano = YEAR(NOW())
         ORDER BY criado_em DESC
@@ -105,7 +105,7 @@ def faltas():
     # Detalhes de cada falta
     cur.execute("""
         SELECT MONTH(data_aula) as mes,
-               DATE_FORMAT(data_aula, '%%d/%%m/%%Y') as data,
+               DATE_FORMAT(data_aula, '%d/%m/%Y') as data,
                t.nome as turma
         FROM portal_chamadas c
         JOIN portal_turmas t ON t.id = c.turma_id
@@ -139,7 +139,7 @@ def comentarios():
     conn = create_connection()
     cur  = get_cursor(conn)
     cur.execute("""
-        SELECT titulo, arquivo, DATE_FORMAT(criado_em, '%%d/%%m/%%Y') as data
+        SELECT titulo, arquivo, DATE_FORMAT(criado_em, '%d/%m/%Y') as data
         FROM portal_comunicados
         WHERE tipo = 'turma'
            OR (tipo = 'aluno' AND aluno_id = %s)

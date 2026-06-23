@@ -15,22 +15,7 @@
 
   <div class="lista-meses-faltas-aluno">
 
-    {% set meses = [
-      ('Janeiro',   1,  2, [('15/01/2026', 'Inglês'), ('21/01/2026', 'Física')]),
-      ('Fevereiro', 2,  1, [('10/02/2026', 'Matemática')]),
-      ('Março',     3,  3, [('05/03/2026', 'Inglês'), ('12/03/2026', 'Física'), ('19/03/2026', 'Inglês')]),
-      ('Abril',     4,  2, [('02/04/2026', 'Física'), ('16/04/2026', 'Inglês')]),
-      ('Maio',      5,  0, []),
-      ('Junho',     6,  0, []),
-      ('Julho',     7,  0, []),
-      ('Agosto',    8,  0, []),
-      ('Setembro',  9,  0, []),
-      ('Outubro',   10, 0, []),
-      ('Novembro',  11, 0, []),
-      ('Dezembro',  12, 0, []),
-    ] %}
-
-    {% for nome_mes, num_mes, qtd, dias in meses %}
+    {% for num_mes, nome_mes in nomes_meses.items() %}
     <div class="card-mes-falta-aluno">
 
       <button class="card-mes-header-aluno" onclick="toggleMes({{ num_mes }})">
@@ -41,8 +26,10 @@
           <span class="nome-mes">{{ nome_mes }}</span>
         </div>
         <div class="card-mes-direita">
-          {% if qtd > 0 %}
-          <span class="qtd-faltas-badge">{{ qtd }} falta{% if qtd > 1 %}s{% endif %}</span>
+          {% if faltas_por_mes.get(num_mes, 0) > 0 %}
+          <span class="qtd-faltas-badge">
+            {{ faltas_por_mes[num_mes] }} falta{% if faltas_por_mes[num_mes] > 1 %}s{% endif %}
+          </span>
           {% endif %}
           <svg class="seta" id="seta-{{ num_mes }}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
             <path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/>
@@ -51,12 +38,12 @@
       </button>
 
       <div class="faltas-detalhe oculto" id="detalhe-{{ num_mes }}">
-        {% if dias %}
-          {% for data, materia in dias %}
+        {% if faltas_detalhe.get(num_mes) %}
+          {% for falta in faltas_detalhe[num_mes] %}
           <div class="card-falta-aluno">
             <div class="falta-info">
-              <span class="falta-data">{{ data }}</span>
-              <span class="falta-materia">{{ materia }}</span>
+              <span class="falta-data">{{ falta.data }}</span>
+              <span class="falta-materia">{{ falta.materia }}</span>
             </div>
             <span class="badge-falta F">F</span>
           </div>
