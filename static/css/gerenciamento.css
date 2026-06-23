@@ -397,3 +397,10 @@
   .campos-linha { flex-direction: column; }
   .filtro-alunos { flex-direction: column; }
 }
+
+/* ===== Erros de validação ===== */
+.campo-erro {
+  font-size: 0.78rem;
+  color: #dc2626;
+  margin-top: 2px;
+}

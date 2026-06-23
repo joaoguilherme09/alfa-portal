@@ -51,7 +51,7 @@
             <p class="card-ger-sub">{{ turma.curso }} — {{ turma.professor }}</p>
           </div>
           <div class="card-ger-acoes">
-            <button class="btn-acao editar">Editar</button>
+            <button class="btn-acao editar" onclick="abrirModalEditarTurma({{ turma.id }})">Editar</button>
           </div>
         </div>
         {% endfor %}
@@ -79,7 +79,7 @@
             </div>
           </div>
           <div class="card-ger-acoes">
-            <button class="btn-acao editar">Editar</button>
+            <button class="btn-acao editar" onclick="abrirModalEditarProfessor({{ prof.id }})">Editar</button>
           </div>
         </div>
         {% endfor %}
@@ -95,7 +95,6 @@
       <h3 class="secao-titulo">Alunos cadastrados</h3>
       <button class="btn-cadastrar" onclick="abrirModal('modal-aluno')">+ Cadastrar Aluno</button>
     </div>
-
     <div class="lista-ger">
       {% if alunos %}
         {% for aluno in alunos %}
@@ -108,7 +107,7 @@
             </div>
           </div>
           <div class="card-ger-acoes">
-            <button class="btn-acao editar">Editar</button>
+            <button class="btn-acao editar" onclick="abrirModalEditar({{ aluno.id }})">Editar</button>
             <button class="btn-acao matricula" onclick="abrirModalMatricula({{ aluno.id }}, '{{ aluno.nome }}')">Matrícula</button>
           </div>
         </div>
@@ -179,6 +178,70 @@
   </form>
 </div>
 
+
+<!-- ===== MODAL EDITAR TURMA ===== -->
+<!-- Cole após o modal de nova turma no gerenciamento.html -->
+
+<div class="modal-overlay oculto" id="overlay-modal-editar-turma" onclick="fecharModal('modal-editar-turma')"></div>
+<div class="modal oculto" id="modal-editar-turma">
+  <div class="modal-header">
+    <h3>Editar Turma</h3>
+    <button class="modal-fechar" onclick="fecharModal('modal-editar-turma')">✕</button>
+  </div>
+  <form action="/professor/editar_turma" method="POST">
+    <input type="hidden" name="turma_id" id="edit-turma-id"/>
+    <div class="modal-corpo">
+      <div class="campo-grupo">
+        <label class="campo-label">Nome da turma</label>
+        <input type="text" class="campo-input" name="nome" id="edit-turma-nome" required/>
+      </div>
+      <div class="campo-grupo">
+        <label class="campo-label">Curso</label>
+        <select class="campo-select" name="curso_id" id="edit-turma-curso" required>
+          <option value="">Selecione o curso</option>
+          {% for curso in cursos %}
+          <option value="{{ curso.id }}">{{ curso.nome }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="campo-grupo">
+        <label class="campo-label">Professor</label>
+        <select class="campo-select" name="professor_id" id="edit-turma-professor" required>
+          {% for prof in professores %}
+          <option value="{{ prof.id }}">{{ prof.nome }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="campo-grupo">
+        <label class="campo-label">Dias da semana</label>
+        <div class="dias-semana" id="edit-dias-semana">
+          {% for dia in ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'] %}
+          <label class="dia-btn">
+            <input type="checkbox" name="dias" value="{{ dia }}" class="edit-dia-check"/> {{ dia }}
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="campo-grupo">
+        <label class="campo-label">Horário</label>
+        <input type="text" class="campo-input" name="horario" id="edit-turma-horario" placeholder="Ex: 14h às 16h" required/>
+      </div>
+      <div class="campo-grupo">
+        <label class="campo-label">Período</label>
+        <select class="campo-select" name="periodo" id="edit-turma-periodo" required>
+          <option value="Manhã">Manhã</option>
+          <option value="Tarde">Tarde</option>
+          <option value="Noite">Noite</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-rodape">
+      <button type="button" class="btn-cancelar" onclick="fecharModal('modal-editar-turma')">Cancelar</button>
+      <button type="submit" class="btn-enviar">Salvar alterações</button>
+    </div>
+  </form>
+</div>
+
 <!-- ===== MODAL NOVO PROFESSOR ===== -->
 <div class="modal-overlay oculto" id="overlay-modal-professor" onclick="fecharModal('modal-professor')"></div>
 <div class="modal oculto" id="modal-professor">
@@ -186,7 +249,7 @@
     <h3>Novo Professor</h3>
     <button class="modal-fechar" onclick="fecharModal('modal-professor')">✕</button>
   </div>
-  <form action="/professor/salvar_professor" method="POST" enctype="multipart/form-data">
+  <form action="/professor/salvar_professor" method="POST">
     <div class="modal-corpo">
       <div class="campo-grupo">
         <label class="campo-label">Nome</label>
@@ -215,6 +278,46 @@
   </form>
 </div>
 
+<!-- ===== MODAL EDITAR PROFESSOR ===== -->
+<!-- Cole após o modal de novo professor no gerenciamento.html -->
+
+<div class="modal-overlay oculto" id="overlay-modal-editar-professor" onclick="fecharModal('modal-editar-professor')"></div>
+<div class="modal oculto" id="modal-editar-professor">
+  <div class="modal-header">
+    <h3>Editar Professor</h3>
+    <button class="modal-fechar" onclick="fecharModal('modal-editar-professor')">✕</button>
+  </div>
+  <form action="/professor/editar_professor" method="POST">
+    <input type="hidden" name="professor_id" id="edit-prof-id"/>
+    <div class="modal-corpo">
+      <div class="campo-grupo">
+        <label class="campo-label">Nome</label>
+        <input type="text" class="campo-input" name="nome" id="edit-prof-nome" required/>
+      </div>
+      <div class="campo-grupo">
+        <label class="campo-label">Matrícula</label>
+        <input type="text" class="campo-input" name="matricula" id="edit-prof-matricula" required/>
+      </div>
+      <div class="campo-grupo">
+        <label class="campo-label">Nova senha <small style="color:#94a3b8">(deixe em branco para não alterar)</small></label>
+        <input type="password" class="campo-input" name="senha" placeholder="Nova senha"/>
+      </div>
+      <div class="campo-grupo">
+        <label class="campo-label">Cargo</label>
+        <select class="campo-select" name="cargo" id="edit-prof-cargo">
+          <option value="professor">Professor</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-rodape">
+      <button type="button" class="btn-cancelar" onclick="fecharModal('modal-editar-professor')">Cancelar</button>
+      <button type="submit" class="btn-enviar">Salvar alterações</button>
+    </div>
+  </form>
+</div>
+
+
 <!-- ===== MODAL CADASTRAR ALUNO ===== -->
 <div class="modal-overlay oculto" id="overlay-modal-aluno" onclick="fecharModal('modal-aluno')"></div>
 <div class="modal oculto" id="modal-aluno">
@@ -224,41 +327,39 @@
   </div>
   <form action="/professor/salvar_aluno" method="POST" enctype="multipart/form-data">
     <div class="modal-corpo">
-
       <p class="secao-grupo">Dados do Responsável</p>
       <div class="campo-grupo">
         <label class="campo-label">Nome do responsável</label>
-        <input type="text" class="campo-input" name="nome_responsavel" placeholder="Nome completo" required/>
+        <input type="text" class="campo-input" name="nome_responsavel" id="input-nome-responsavel" placeholder="Nome completo" required/>
       </div>
       <div class="campos-linha">
         <div class="campo-grupo">
           <label class="campo-label">Nascimento</label>
-          <input type="date" class="campo-input" name="nascimento_responsavel" required/>
+          <input type="date" class="campo-input" name="nascimento_responsavel" id="input-nasc-responsavel" required/>
         </div>
         <div class="campo-grupo">
           <label class="campo-label">CPF</label>
-          <input type="text" class="campo-input" name="cpf_responsavel" placeholder="000.000.000-00" required/>
+          <input type="text" class="campo-input" name="cpf_responsavel" id="input-cpf" placeholder="000.000.000-00" maxlength="14" required/>
         </div>
       </div>
       <div class="campos-linha">
         <div class="campo-grupo">
           <label class="campo-label">RG</label>
-          <input type="text" class="campo-input" name="rg_responsavel" placeholder="00.000.000-0" required/>
+          <input type="text" class="campo-input" name="rg_responsavel" id="input-rg" placeholder="00.000.000-0" maxlength="12" required/>
         </div>
         <div class="campo-grupo">
           <label class="campo-label">Telefone</label>
-          <input type="text" class="campo-input" name="telefone_responsavel" placeholder="(12) 00000-0000" required/>
+          <input type="text" class="campo-input" name="telefone_responsavel" id="input-telefone" placeholder="(12) 00000-0000" maxlength="15" required/>
         </div>
       </div>
-
       <p class="secao-grupo">Dados do Aluno</p>
       <div class="campo-grupo">
         <label class="campo-label">Nome do aluno</label>
-        <input type="text" class="campo-input" name="nome" placeholder="Nome completo" required/>
+        <input type="text" class="campo-input" name="nome" id="input-nome-aluno" placeholder="Nome completo" required/>
       </div>
       <div class="campo-grupo">
         <label class="campo-label">Nascimento</label>
-        <input type="date" class="campo-input" name="nascimento" required/>
+        <input type="date" class="campo-input" name="nascimento" id="input-nasc-aluno" required/>
       </div>
       <div class="campo-grupo">
         <label class="campo-label">Endereço</label>
@@ -284,7 +385,6 @@
           <input type="text" class="campo-input" name="cep" placeholder="00000-000" required/>
         </div>
       </div>
-
       <p class="secao-grupo">Dados Acadêmicos</p>
       <div class="campo-grupo">
         <label class="campo-label">Turma</label>
@@ -307,11 +407,108 @@
         <label class="campo-label">Senha</label>
         <input type="text" class="campo-input" name="senha" placeholder="Senha de acesso" required/>
       </div>
-
     </div>
     <div class="modal-rodape">
       <button type="button" class="btn-cancelar" onclick="fecharModal('modal-aluno')">Cancelar</button>
       <button type="submit" class="btn-enviar">Salvar</button>
+    </div>
+  </form>
+</div>
+
+<!-- ===== MODAL EDITAR ALUNO ===== -->
+<div class="modal-overlay oculto" id="overlay-modal-editar-aluno" onclick="fecharModal('modal-editar-aluno')"></div>
+<div class="modal oculto" id="modal-editar-aluno">
+  <div class="modal-header">
+    <h3>Editar Aluno</h3>
+    <button class="modal-fechar" onclick="fecharModal('modal-editar-aluno')">✕</button>
+  </div>
+  <form action="/professor/editar_aluno" method="POST">
+    <input type="hidden" name="aluno_id" id="edit-aluno-id"/>
+    <div class="modal-corpo">
+      <p class="secao-grupo">Dados do Responsável</p>
+      <div class="campo-grupo">
+        <label class="campo-label">Nome do responsável</label>
+        <input type="text" class="campo-input" name="nome_responsavel" id="edit-nome-responsavel" required/>
+      </div>
+      <div class="campos-linha">
+        <div class="campo-grupo">
+          <label class="campo-label">Nascimento</label>
+          <input type="date" class="campo-input" name="nascimento_responsavel" id="edit-nasc-responsavel" required/>
+        </div>
+        <div class="campo-grupo">
+          <label class="campo-label">CPF</label>
+          <input type="text" class="campo-input" name="cpf_responsavel" id="edit-cpf" maxlength="14" required/>
+        </div>
+      </div>
+      <div class="campos-linha">
+        <div class="campo-grupo">
+          <label class="campo-label">RG</label>
+          <input type="text" class="campo-input" name="rg_responsavel" id="edit-rg" maxlength="12" required/>
+        </div>
+        <div class="campo-grupo">
+          <label class="campo-label">Telefone</label>
+          <input type="text" class="campo-input" name="telefone_responsavel" id="edit-telefone" maxlength="15" required/>
+        </div>
+      </div>
+      <p class="secao-grupo">Dados do Aluno</p>
+      <div class="campo-grupo">
+        <label class="campo-label">Nome do aluno</label>
+        <input type="text" class="campo-input" name="nome" id="edit-nome-aluno" required/>
+      </div>
+      <div class="campo-grupo">
+        <label class="campo-label">Nascimento</label>
+        <input type="date" class="campo-input" name="nascimento" id="edit-nasc-aluno" required/>
+      </div>
+      <div class="campo-grupo">
+        <label class="campo-label">Endereço</label>
+        <input type="text" class="campo-input" name="endereco" id="edit-endereco" required/>
+      </div>
+      <div class="campos-linha">
+        <div class="campo-grupo">
+          <label class="campo-label">Número</label>
+          <input type="text" class="campo-input" name="numero" id="edit-numero" required/>
+        </div>
+        <div class="campo-grupo">
+          <label class="campo-label">Bairro</label>
+          <input type="text" class="campo-input" name="bairro" id="edit-bairro" required/>
+        </div>
+      </div>
+      <div class="campos-linha">
+        <div class="campo-grupo">
+          <label class="campo-label">Cidade</label>
+          <input type="text" class="campo-input" name="cidade" id="edit-cidade"/>
+        </div>
+        <div class="campo-grupo">
+          <label class="campo-label">CEP</label>
+          <input type="text" class="campo-input" name="cep" id="edit-cep" required/>
+        </div>
+      </div>
+      <p class="secao-grupo">Dados Acadêmicos</p>
+      <div class="campo-grupo">
+        <label class="campo-label">Turma</label>
+        <select class="campo-select" name="turma_id" id="edit-turma">
+          <option value="">Selecione a turma</option>
+          {% for turma in turmas %}
+          <option value="{{ turma.id }}">{{ turma.curso }} — {{ turma.nome }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="campo-grupo">
+        <label class="campo-label">Período</label>
+        <select class="campo-select" name="periodo" id="edit-periodo">
+          <option value="Manhã">Manhã</option>
+          <option value="Tarde">Tarde</option>
+          <option value="Noite">Noite</option>
+        </select>
+      </div>
+      <div class="campo-grupo">
+        <label class="campo-label">Senha</label>
+        <input type="text" class="campo-input" name="senha" id="edit-senha" required/>
+      </div>
+    </div>
+    <div class="modal-rodape">
+      <button type="button" class="btn-cancelar" onclick="fecharModal('modal-editar-aluno')">Cancelar</button>
+      <button type="submit" class="btn-enviar">Salvar alterações</button>
     </div>
   </form>
 </div>
@@ -378,28 +575,6 @@
 {% endblock %}
 
 {% block script %}
-<script>
-function trocarAba(aba, botao) {
-  document.querySelectorAll('.painel-aba').forEach(p => p.classList.add('oculto'));
-  document.querySelectorAll('.aba').forEach(b => b.classList.remove('ativa'));
-  document.getElementById('painel-' + aba).classList.remove('oculto');
-  botao.classList.add('ativa');
-}
-
-function abrirModal(id) {
-  document.getElementById('overlay-' + id).classList.remove('oculto');
-  document.getElementById(id).classList.remove('oculto');
-}
-
-function fecharModal(id) {
-  document.getElementById('overlay-' + id).classList.add('oculto');
-  document.getElementById(id).classList.add('oculto');
-}
-
-function abrirModalMatricula(alunoId, nomeAluno) {
-  document.getElementById('input-aluno-id-matricula').value = alunoId;
-  document.getElementById('nome-aluno-matricula').textContent = nomeAluno;
-  abrirModal('modal-matricula');
-}
-</script>
+<script src="{{ url_for('static', filename='js/gerenciamento.js') }}"></script>
+<script src="{{ url_for('static', filename='js/cadastro_aluno.js') }}"></script>
 {% endblock %}
