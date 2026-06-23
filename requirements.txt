@@ -1,0 +1,9 @@
+Flask==3.0.3
+mysql-connector-python==9.0.0
+python-dotenv==1.0.1
+docxtpl==0.19.0
+docx2pdf==0.1.8
+Pillow==10.4.0
+Werkzeug==3.0.3
+bcrypt==4.2.0
+python-docx==1.1.2
