@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from db import create_connection, get_cursor
+from crypto import verificar_senha, descriptografar
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -13,13 +14,11 @@ def login_aluno():
         cur  = get_cursor(conn)
         cur.execute("""
             SELECT id, nome, matricula, senha, periodo, foto
-            FROM portal_alunos
-            WHERE matricula = %s
+            FROM portal_alunos WHERE matricula = %s
         """, (matricula,))
         aluno = cur.fetchone()
 
-        if aluno and aluno['senha'] == senha:
-            # Buscar TODOS os cursos do aluno
+        if aluno and verificar_senha(senha, aluno['senha']):
             cur.execute("""
                 SELECT DISTINCT c.nome as curso
                 FROM portal_aluno_turma at2
@@ -60,14 +59,13 @@ def login_professor():
         cur  = get_cursor(conn)
         cur.execute("""
             SELECT id, nome, matricula, senha, cargo, foto
-            FROM portal_professores
-            WHERE matricula = %s
+            FROM portal_professores WHERE matricula = %s
         """, (matricula,))
         professor = cur.fetchone()
         cur.close()
         conn.close()
 
-        if professor and professor['senha'] == senha:
+        if professor and verificar_senha(senha, professor['senha']):
             session['perfil']    = 'professor'
             session['id']        = professor['id']
             session['nome']      = professor['nome']

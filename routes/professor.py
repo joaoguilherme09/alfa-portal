@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, session, redirect, url_for
 from db import create_connection, get_cursor
 from datetime import date
+from crypto import criptografar, descriptografar, hash_senha
 
 professor_bp = Blueprint('professor', __name__, url_prefix='/professor')
 
@@ -368,37 +369,35 @@ def salvar_turma():
     conn.close()
     return redirect(url_for('professor.gerenciamento'))
 
+
 @professor_bp.route('/salvar_professor', methods=['POST'])
 @login_required
 def salvar_professor():
-    nome      = flask_request.form.get('nome')
-    matricula = flask_request.form.get('matricula')
-    senha     = flask_request.form.get('senha')
-    cargo     = flask_request.form.get('cargo')
-
+    f = flask_request.form
     conn = create_connection()
     cur  = get_cursor(conn)
     cur.execute("""
         INSERT INTO portal_professores (nome, matricula, senha, cargo)
         VALUES (%s, %s, %s, %s)
-    """, (nome, matricula, senha, cargo))
+    """, (f['nome'], f['matricula'], hash_senha(f['senha']), f['cargo']))
     conn.commit()
     cur.close()
     conn.close()
     return redirect(url_for('professor.gerenciamento'))
  
+
+ 
 @professor_bp.route('/salvar_aluno', methods=['POST'])
 @login_required
 def salvar_aluno():
-    f        = flask_request.form
-    turmas   = flask_request.form.getlist('turmas[]')
+    f      = flask_request.form
+    turmas = flask_request.form.getlist('turmas[]')
  
     conn = create_connection()
     cur  = get_cursor(conn)
  
-    # Gerar matrícula automática
     cur.execute("SELECT MAX(CAST(matricula AS UNSIGNED)) as max_mat FROM portal_alunos")
-    resultado    = cur.fetchone()
+    resultado      = cur.fetchone()
     nova_matricula = str((resultado['max_mat'] or 50240000) + 1)
  
     cur.execute("""
@@ -409,15 +408,24 @@ def salvar_aluno():
             matricula, senha, periodo
         ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
     """, (
-        f['nome_responsavel'], f['nascimento_responsavel'], f['cpf_responsavel'],
-        f['rg_responsavel'], f['telefone_responsavel'],
-        f['nome'], f['nascimento'], f['endereco'], f['bairro'],
-        f['numero'], f['cidade'], f['cep'],
-        nova_matricula, f['senha'], f['periodo']
+        criptografar(f['nome_responsavel']),
+        f['nascimento_responsavel'],
+        criptografar(f['cpf_responsavel']),
+        criptografar(f['rg_responsavel']),
+        criptografar(f['telefone_responsavel']),
+        f['nome'],
+        f['nascimento'],
+        criptografar(f['endereco']),
+        criptografar(f['bairro']),
+        criptografar(f['numero']),
+        criptografar(f['cidade']),
+        criptografar(f['cep']),
+        nova_matricula,
+        hash_senha(f['senha']),
+        f['periodo']
     ))
     aluno_id = cur.lastrowid
  
-    # Vincular às turmas selecionadas
     for turma_id in turmas:
         cur.execute("""
             INSERT INTO portal_aluno_turma (aluno_id, turma_id)
@@ -432,20 +440,20 @@ def salvar_aluno():
 
 import os
 from docxtpl import DocxTemplate
+
+
 @professor_bp.route('/salvar_matricula', methods=['POST'])
 @login_required
 def salvar_matricula():
     f = flask_request.form
     aluno_id = f['aluno_id']
-
+ 
     conn = create_connection()
     cur  = get_cursor(conn)
-
-    # Buscar dados do aluno
+ 
     cur.execute("SELECT * FROM portal_alunos WHERE id = %s", (aluno_id,))
     aluno = cur.fetchone()
-
-    # Buscar turma do aluno para pegar dia e horário
+ 
     cur.execute("""
         SELECT t.dias_semana, t.horario
         FROM portal_aluno_turma at2
@@ -453,21 +461,17 @@ def salvar_matricula():
         WHERE at2.aluno_id = %s LIMIT 1
     """, (aluno_id,))
     turma = cur.fetchone()
-
-    # Número do contrato
+ 
     numero_contrato = f.get('numero_contrato')
     if not numero_contrato:
         cur.execute("SELECT MAX(numero_contrato) as max_num FROM portal_matriculas_contratos")
         resultado = cur.fetchone()
         numero_contrato = (resultado['max_num'] or 0) + 1
-
-    # Parcelas por extenso automático
+ 
     extenso_map = {'6': 'SEIS', '12': 'DOZE', '18': 'DEZOITO'}
     parcelas_extenso = extenso_map.get(str(f['qtd_parcelas']), f['qtd_parcelas'])
-
     dia_horario = f'{turma["dias_semana"]} {turma["horario"]}' if turma else '—'
-
-    # Salvar no banco com tratamento de erro
+ 
     try:
         cur.execute("""
             INSERT INTO portal_matriculas_contratos (
@@ -488,33 +492,31 @@ def salvar_matricula():
         if '1062' in str(e):
             return f"<script>alert('Número de contrato {numero_contrato} já existe! Use outro número.'); history.back();</script>"
         return f"Erro: {str(e)}", 500
-
-    # Formatar datas para o contrato (dd/mm/aaaa)
+ 
     def fmt_data(d):
         if not d: return ''
         partes = str(d).split('-')
         if len(partes) == 3:
             return f"{partes[2]}/{partes[1]}/{partes[0]}"
         return str(d)
-
-    # Preencher o modelo com docxtpl
+ 
     modelo_path = os.path.join('contrato', 'modelo-contrato.docx')
     doc = DocxTemplate(modelo_path)
-
+ 
     contexto = {
         'numero_contrato':         str(numero_contrato),
-        'nome_responsavel':        aluno['nome_responsavel'],
+        'nome_responsavel':        descriptografar(aluno['nome_responsavel']),
         'nascimento_responsavel':  fmt_data(aluno['nascimento_responsavel']),
-        'cpf_responsavel':         aluno['cpf_responsavel'],
-        'rg_responsavel':          aluno['rg_responsavel'],
-        'telefone_responsavel':    aluno['telefone_responsavel'],
+        'cpf_responsavel':         descriptografar(aluno['cpf_responsavel']),
+        'rg_responsavel':          descriptografar(aluno['rg_responsavel']),
+        'telefone_responsavel':    descriptografar(aluno['telefone_responsavel']),
         'nome_aluno':              aluno['nome'],
         'nascimento_aluno':        fmt_data(aluno['nascimento']),
-        'endereco':                aluno['endereco'],
-        'bairro':                  aluno['bairro'],
-        'numero':                  aluno['numero'],
-        'cidade':                  aluno['cidade'],
-        'cep':                     aluno['cep'],
+        'endereco':                descriptografar(aluno['endereco']),
+        'bairro':                  descriptografar(aluno['bairro']),
+        'numero':                  descriptografar(aluno['numero']),
+        'cidade':                  descriptografar(aluno['cidade']),
+        'cep':                     descriptografar(aluno['cep']),
         'data_matricula':          fmt_data(f['data_matricula']),
         'data_primeiro_pagamento': fmt_data(f['data_primeiro_pagamento']),
         'curso_contrato':          f['curso_contrato'],
@@ -525,16 +527,14 @@ def salvar_matricula():
         'valor_parcela':           f['valor_parcela'],
         'dia_horario':             dia_horario,
     }
-
+ 
     doc.render(contexto)
-
-    # Salvar o docx preenchido
+ 
     os.makedirs('uploads/contratos', exist_ok=True)
-    nome_arquivo = f"contrato_{numero_contrato}_{aluno_id}.docx"
-    caminho_docx = os.path.join('uploads', 'contratos', nome_arquivo)
+    nome_arquivo  = f"contrato_{numero_contrato}_{aluno_id}.docx"
+    caminho_docx  = os.path.join('uploads', 'contratos', nome_arquivo)
     doc.save(caminho_docx)
-
-    # Atualizar arquivo gerado no banco
+ 
     cur.execute("""
         UPDATE portal_matriculas_contratos SET arquivo_gerado = %s
         WHERE aluno_id = %s AND numero_contrato = %s
@@ -542,16 +542,17 @@ def salvar_matricula():
     conn.commit()
     cur.close()
     conn.close()
-
-    # Baixar o arquivo
+ 
     from flask import send_file
     return send_file(
         caminho_docx,
         as_attachment=True,
         download_name=f"Contrato_{aluno['nome']}.docx"
     )
+ 
 
-
+from crypto import criptografar, descriptografar, hash_senha
+ 
 @professor_bp.route('/buscar_aluno/<int:aluno_id>')
 @login_required
 def buscar_aluno(aluno_id):
@@ -560,18 +561,26 @@ def buscar_aluno(aluno_id):
     cur.execute("SELECT * FROM portal_alunos WHERE id = %s", (aluno_id,))
     aluno = cur.fetchone()
  
-    # Buscar TODAS as turmas do aluno
-    cur.execute("""
-        SELECT turma_id FROM portal_aluno_turma WHERE aluno_id = %s
-    """, (aluno_id,))
+    cur.execute("SELECT turma_id FROM portal_aluno_turma WHERE aluno_id = %s", (aluno_id,))
     turmas = [t['turma_id'] for t in cur.fetchall()]
     cur.close()
     conn.close()
  
     if aluno:
-        aluno['nascimento']             = str(aluno['nascimento'])
+        # Descriptografar dados sensíveis
+        aluno['nome_responsavel']       = descriptografar(aluno['nome_responsavel'])
         aluno['nascimento_responsavel'] = str(aluno['nascimento_responsavel'])
+        aluno['cpf_responsavel']        = descriptografar(aluno['cpf_responsavel'])
+        aluno['rg_responsavel']         = descriptografar(aluno['rg_responsavel'])
+        aluno['telefone_responsavel']   = descriptografar(aluno['telefone_responsavel'])
+        aluno['nascimento']             = str(aluno['nascimento'])
+        aluno['endereco']               = descriptografar(aluno['endereco'])
+        aluno['bairro']                 = descriptografar(aluno['bairro'])
+        aluno['numero']                 = descriptografar(aluno['numero'])
+        aluno['cidade']                 = descriptografar(aluno['cidade'])
+        aluno['cep']                    = descriptografar(aluno['cep'])
         aluno['turmas']                 = turmas
+        aluno['senha']                  = ''  # nunca retornar hash da senha
         return jsonify(aluno)
     return jsonify({'erro': 'Aluno não encontrado'}), 404
  
@@ -586,22 +595,45 @@ def editar_aluno():
     conn = create_connection()
     cur  = get_cursor(conn)
  
-    cur.execute("""
-        UPDATE portal_alunos SET
-            nome_responsavel = %s, nascimento_responsavel = %s,
-            cpf_responsavel = %s, rg_responsavel = %s, telefone_responsavel = %s,
-            nome = %s, nascimento = %s, endereco = %s, bairro = %s,
-            numero = %s, cidade = %s, cep = %s, periodo = %s, senha = %s
-        WHERE id = %s
-    """, (
-        f['nome_responsavel'], f['nascimento_responsavel'],
-        f['cpf_responsavel'], f['rg_responsavel'], f['telefone_responsavel'],
-        f['nome'], f['nascimento'], f['endereco'], f['bairro'],
-        f['numero'], f['cidade'], f['cep'], f['periodo'], f['senha'],
-        aluno_id
-    ))
+    # Atualizar senha só se foi digitada
+    if f.get('senha'):
+        cur.execute("""
+            UPDATE portal_alunos SET
+                nome_responsavel = %s, nascimento_responsavel = %s,
+                cpf_responsavel = %s, rg_responsavel = %s, telefone_responsavel = %s,
+                nome = %s, nascimento = %s, endereco = %s, bairro = %s,
+                numero = %s, cidade = %s, cep = %s, periodo = %s, senha = %s
+            WHERE id = %s
+        """, (
+            criptografar(f['nome_responsavel']), f['nascimento_responsavel'],
+            criptografar(f['cpf_responsavel']), criptografar(f['rg_responsavel']),
+            criptografar(f['telefone_responsavel']),
+            f['nome'], f['nascimento'],
+            criptografar(f['endereco']), criptografar(f['bairro']),
+            criptografar(f['numero']), criptografar(f['cidade']),
+            criptografar(f['cep']), f['periodo'],
+            hash_senha(f['senha']),
+            aluno_id
+        ))
+    else:
+        cur.execute("""
+            UPDATE portal_alunos SET
+                nome_responsavel = %s, nascimento_responsavel = %s,
+                cpf_responsavel = %s, rg_responsavel = %s, telefone_responsavel = %s,
+                nome = %s, nascimento = %s, endereco = %s, bairro = %s,
+                numero = %s, cidade = %s, cep = %s, periodo = %s
+            WHERE id = %s
+        """, (
+            criptografar(f['nome_responsavel']), f['nascimento_responsavel'],
+            criptografar(f['cpf_responsavel']), criptografar(f['rg_responsavel']),
+            criptografar(f['telefone_responsavel']),
+            f['nome'], f['nascimento'],
+            criptografar(f['endereco']), criptografar(f['bairro']),
+            criptografar(f['numero']), criptografar(f['cidade']),
+            criptografar(f['cep']), f['periodo'],
+            aluno_id
+        ))
  
-    # Atualizar turmas — apaga todas e recadastra
     cur.execute("DELETE FROM portal_aluno_turma WHERE aluno_id = %s", (aluno_id,))
     for turma_id in turmas:
         cur.execute("""
@@ -628,35 +660,35 @@ def buscar_professor(professor_id):
         return jsonify(professor)
     return jsonify({'erro': 'Professor não encontrado'}), 404
 
+
 @professor_bp.route('/editar_professor', methods=['POST'])
 @login_required
 def editar_professor():
-    f = flask_request.form
+    f            = flask_request.form
     professor_id = f['professor_id']
-
+ 
     conn = create_connection()
     cur  = get_cursor(conn)
-
+ 
     if f.get('senha'):
         cur.execute("""
             UPDATE portal_professores
             SET nome = %s, matricula = %s, cargo = %s, senha = %s
             WHERE id = %s
-        """, (f['nome'], f['matricula'], f['cargo'], f['senha'], professor_id))
+        """, (f['nome'], f['matricula'], f['cargo'], hash_senha(f['senha']), professor_id))
     else:
         cur.execute("""
             UPDATE portal_professores
             SET nome = %s, matricula = %s, cargo = %s
             WHERE id = %s
         """, (f['nome'], f['matricula'], f['cargo'], professor_id))
-
+ 
     conn.commit()
     cur.close()
     conn.close()
     return redirect(url_for('professor.gerenciamento'))
-
-
-
+ 
+ 
 @professor_bp.route('/buscar_turma/<int:turma_id>')
 @login_required
 def buscar_turma(turma_id):
