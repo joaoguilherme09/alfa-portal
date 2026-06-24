@@ -541,7 +541,7 @@ def salvar_matricula():
     return send_file(
         caminho_docx,
         as_attachment=True,
-        download_name=f"Contrato_{numero_contrato}.docx"
+        download_name=f"Contrato_{aluno['nome']}.docx"
     )
 
 
