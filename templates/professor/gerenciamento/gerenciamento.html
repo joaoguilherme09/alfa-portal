@@ -516,7 +516,6 @@
     </div>
   </form>
 </div>
-
 <!-- ===== MODAL MATRÍCULA ===== -->
 <div class="modal-overlay oculto" id="overlay-modal-matricula" onclick="fecharModal('modal-matricula')"></div>
 <div class="modal oculto" id="modal-matricula">
@@ -527,42 +526,53 @@
   <form action="/professor/salvar_matricula" method="POST">
     <input type="hidden" name="aluno_id" id="input-aluno-id-matricula"/>
     <div class="modal-corpo">
+
       <div class="campo-grupo">
-        <label class="campo-label">Curso / Matéria</label>
-        <input type="text" class="campo-input" name="curso_contrato" placeholder="Ex: Reforço Escolar" required/>
+        <label class="campo-label">Número do contrato</label>
+        <input type="number" class="campo-input" name="numero_contrato" placeholder="Ex: 31" required/>
       </div>
+
       <div class="campo-grupo">
-        <label class="campo-label">Módulo</label>
-        <input type="text" class="campo-input" name="modulo" placeholder="Ex: Português – Matemática" required/>
+        <label class="campo-label">Data da matrícula</label>
+        <input type="date" class="campo-input" name="data_matricula" required/>
       </div>
-      <div class="campos-linha">
-        <div class="campo-grupo">
-          <label class="campo-label">Preço total</label>
-          <input type="text" class="campo-input" name="preco_total" placeholder="Ex: 1200.00" required/>
-        </div>
-        <div class="campo-grupo">
-          <label class="campo-label">Nº de parcelas</label>
-          <input type="number" class="campo-input" name="qtd_parcelas" placeholder="Ex: 12" required/>
-        </div>
-      </div>
-      <div class="campos-linha">
-        <div class="campo-grupo">
-          <label class="campo-label">Parcelas por extenso</label>
-          <input type="text" class="campo-input" name="parcelas_extenso" placeholder="Ex: DOZE" required/>
-        </div>
-        <div class="campo-grupo">
-          <label class="campo-label">Valor da parcela</label>
-          <input type="text" class="campo-input" name="valor_parcela" placeholder="Ex: 100.00" required/>
-        </div>
-      </div>
+
       <div class="campo-grupo">
         <label class="campo-label">Data do 1º pagamento</label>
         <input type="date" class="campo-input" name="data_primeiro_pagamento" required/>
       </div>
+
       <div class="campo-grupo">
-        <label class="campo-label">Dia e horário</label>
-        <input type="text" class="campo-input" name="dia_horario" placeholder="Ex: Terça e Quinta 14h às 16h" required/>
+        <label class="campo-label">Curso / Matéria</label>
+        <input type="text" class="campo-input" name="curso_contrato" placeholder="Ex: Reforço Escolar" required/>
       </div>
+
+      <div class="campo-grupo">
+        <label class="campo-label">Módulo</label>
+        <input type="text" class="campo-input" name="modulo" placeholder="Ex: Português – Matemática" required/>
+      </div>
+
+      <div class="campo-grupo">
+        <label class="campo-label">Preço total</label>
+        <input type="text" class="campo-input" name="preco_total" placeholder="Ex: R$ 1.200,00" required/>
+      </div>
+
+      <div class="campos-linha">
+        <div class="campo-grupo">
+          <label class="campo-label">Nº de parcelas</label>
+          <select class="campo-select" name="qtd_parcelas" required>
+            <option value="">Selecione</option>
+            <option value="6">6 parcelas</option>
+            <option value="12">12 parcelas</option>
+            <option value="18">18 parcelas</option>
+          </select>
+        </div>
+        <div class="campo-grupo">
+          <label class="campo-label">Valor da parcela</label>
+          <input type="text" class="campo-input" name="valor_parcela" placeholder="Ex: R$ 100,00" required/>
+        </div>
+      </div>
+
     </div>
     <div class="modal-rodape">
       <button type="button" class="btn-cancelar" onclick="fecharModal('modal-matricula')">Cancelar</button>
@@ -570,11 +580,12 @@
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
           <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
         </svg>
-        Gerar Contrato PDF
+        Gerar Contrato
       </button>
     </div>
   </form>
 </div>
+
 
 {% endblock %}
 

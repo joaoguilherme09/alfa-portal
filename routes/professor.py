@@ -430,19 +430,45 @@ def salvar_aluno():
     return redirect(url_for('professor.gerenciamento'))
  
 
+import os
+from docxtpl import DocxTemplate
+
 @professor_bp.route('/salvar_matricula', methods=['POST'])
 @login_required
 def salvar_matricula():
     f = flask_request.form
+    aluno_id = f['aluno_id']
 
     conn = create_connection()
     cur  = get_cursor(conn)
 
-    # Próximo número de contrato
-    cur.execute("SELECT MAX(numero_contrato) as max_num FROM portal_matriculas_contratos")
-    resultado = cur.fetchone()
-    numero_contrato = (resultado['max_num'] or 0) + 1
+    # Buscar dados do aluno
+    cur.execute("SELECT * FROM portal_alunos WHERE id = %s", (aluno_id,))
+    aluno = cur.fetchone()
 
+    # Buscar turma do aluno para pegar dia e horário
+    cur.execute("""
+        SELECT t.dias_semana, t.horario
+        FROM portal_aluno_turma at2
+        JOIN portal_turmas t ON t.id = at2.turma_id
+        WHERE at2.aluno_id = %s LIMIT 1
+    """, (aluno_id,))
+    turma = cur.fetchone()
+
+    # Próximo número de contrato (se não digitado)
+    numero_contrato = f.get('numero_contrato')
+    if not numero_contrato:
+        cur.execute("SELECT MAX(numero_contrato) as max_num FROM portal_matriculas_contratos")
+        resultado = cur.fetchone()
+        numero_contrato = (resultado['max_num'] or 0) + 1
+
+    # Parcelas por extenso automático
+    extenso_map = {'6': 'SEIS', '12': 'DOZE', '18': 'DEZOITO'}
+    parcelas_extenso = extenso_map.get(str(f['qtd_parcelas']), f['qtd_parcelas'])
+
+    dia_horario = f'{turma["dias_semana"]} {turma["horario"]}' if turma else '—'
+
+    # Salvar no banco
     cur.execute("""
         INSERT INTO portal_matriculas_contratos (
             aluno_id, numero_contrato, data_matricula, data_primeiro_pagamento,
@@ -450,16 +476,75 @@ def salvar_matricula():
             parcelas_extenso, valor_parcela, dia_horario
         ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
     """, (
-        f['aluno_id'], numero_contrato, datetime.date.today(),
+        aluno_id, numero_contrato, f['data_matricula'],
         f['data_primeiro_pagamento'], f['curso_contrato'], f['modulo'],
-        f['preco_total'], f['qtd_parcelas'], f['parcelas_extenso'],
-        f['valor_parcela'], f['dia_horario']
+        f['preco_total'], f['qtd_parcelas'], parcelas_extenso,
+        f['valor_parcela'], dia_horario
     ))
+    conn.commit()
+
+    # Formatar datas para o contrato (dd/mm/aaaa)
+    def fmt_data(d):
+        if not d: return ''
+        partes = str(d).split('-')
+        if len(partes) == 3:
+            return f"{partes[2]}/{partes[1]}/{partes[0]}"
+        return str(d)
+
+    # Preencher o modelo com docxtpl
+    modelo_path = os.path.join('contrato', 'modelo-contrato.docx')
+    doc = DocxTemplate(modelo_path)
+
+    contexto = {
+        'numero_contrato':         str(numero_contrato),
+        'nome_responsavel':        aluno['nome_responsavel'],
+        'nascimento_responsavel':  fmt_data(aluno['nascimento_responsavel']),
+        'cpf_responsavel':         aluno['cpf_responsavel'],
+        'rg_responsavel':          aluno['rg_responsavel'],
+        'telefone_responsavel':    aluno['telefone_responsavel'],
+        'nome_aluno':              aluno['nome'],
+        'nascimento_aluno':        fmt_data(aluno['nascimento']),
+        'endereco':                aluno['endereco'],
+        'bairro':                  aluno['bairro'],
+        'numero':                  aluno['numero'],
+        'cep':                     aluno['cep'],
+        'data_matricula':          fmt_data(f['data_matricula']),
+        'data_primeiro_pagamento': fmt_data(f['data_primeiro_pagamento']),
+        'curso_contrato':          f['curso_contrato'],
+        'modulo':                  f['modulo'],
+        'preco_total':             f['preco_total'],
+        'qtd_parcelas':            f['qtd_parcelas'],
+        'parcelas_extenso':        parcelas_extenso,
+        'valor_parcela':           f['valor_parcela'],
+        'dia_horario':             dia_horario,
+    }
+
+    doc.render(contexto)
+
+    # Salvar o docx preenchido
+    os.makedirs('uploads/contratos', exist_ok=True)
+    nome_arquivo = f"contrato_{numero_contrato}_{aluno_id}.docx"
+    caminho_docx = os.path.join('uploads', 'contratos', nome_arquivo)
+    doc.save(caminho_docx)
+
+    # Atualizar arquivo gerado no banco
+    cur.execute("""
+        UPDATE portal_matriculas_contratos SET arquivo_gerado = %s
+        WHERE aluno_id = %s AND numero_contrato = %s
+    """, (nome_arquivo, aluno_id, numero_contrato))
     conn.commit()
     cur.close()
     conn.close()
-    return redirect(url_for('professor.gerenciamento'))
- 
+
+    # Baixar o arquivo
+    from flask import send_file
+    return send_file(
+        caminho_docx,
+        as_attachment=True,
+        download_name=f"Contrato_{numero_contrato}.docx"
+    )
+
+
 @professor_bp.route('/buscar_aluno/<int:aluno_id>')
 @login_required
 def buscar_aluno(aluno_id):
