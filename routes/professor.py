@@ -432,7 +432,6 @@ def salvar_aluno():
 
 import os
 from docxtpl import DocxTemplate
-
 @professor_bp.route('/salvar_matricula', methods=['POST'])
 @login_required
 def salvar_matricula():
@@ -455,7 +454,7 @@ def salvar_matricula():
     """, (aluno_id,))
     turma = cur.fetchone()
 
-    # Próximo número de contrato (se não digitado)
+    # Número do contrato
     numero_contrato = f.get('numero_contrato')
     if not numero_contrato:
         cur.execute("SELECT MAX(numero_contrato) as max_num FROM portal_matriculas_contratos")
@@ -468,20 +467,27 @@ def salvar_matricula():
 
     dia_horario = f'{turma["dias_semana"]} {turma["horario"]}' if turma else '—'
 
-    # Salvar no banco
-    cur.execute("""
-        INSERT INTO portal_matriculas_contratos (
-            aluno_id, numero_contrato, data_matricula, data_primeiro_pagamento,
-            curso_contrato, modulo, preco_total, qtd_parcelas,
-            parcelas_extenso, valor_parcela, dia_horario
-        ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-    """, (
-        aluno_id, numero_contrato, f['data_matricula'],
-        f['data_primeiro_pagamento'], f['curso_contrato'], f['modulo'],
-        f['preco_total'], f['qtd_parcelas'], parcelas_extenso,
-        f['valor_parcela'], dia_horario
-    ))
-    conn.commit()
+    # Salvar no banco com tratamento de erro
+    try:
+        cur.execute("""
+            INSERT INTO portal_matriculas_contratos (
+                aluno_id, numero_contrato, data_matricula, data_primeiro_pagamento,
+                curso_contrato, modulo, preco_total, qtd_parcelas,
+                parcelas_extenso, valor_parcela, dia_horario
+            ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+        """, (
+            aluno_id, numero_contrato, f['data_matricula'],
+            f['data_primeiro_pagamento'], f['curso_contrato'], f['modulo'],
+            f['preco_total'], f['qtd_parcelas'], parcelas_extenso,
+            f['valor_parcela'], dia_horario
+        ))
+        conn.commit()
+    except Exception as e:
+        cur.close()
+        conn.close()
+        if '1062' in str(e):
+            return f"<script>alert('Número de contrato {numero_contrato} já existe! Use outro número.'); history.back();</script>"
+        return f"Erro: {str(e)}", 500
 
     # Formatar datas para o contrato (dd/mm/aaaa)
     def fmt_data(d):
@@ -507,6 +513,7 @@ def salvar_matricula():
         'endereco':                aluno['endereco'],
         'bairro':                  aluno['bairro'],
         'numero':                  aluno['numero'],
+        'cidade':                  aluno['cidade'],
         'cep':                     aluno['cep'],
         'data_matricula':          fmt_data(f['data_matricula']),
         'data_primeiro_pagamento': fmt_data(f['data_primeiro_pagamento']),
