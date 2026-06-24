@@ -5,4 +5,7 @@ docxtpl
 docx2pdf
 pillow
 werkzeug
+bcrypt
+cryptography
+python-docx
 gunicorn
