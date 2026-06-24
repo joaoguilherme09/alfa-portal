@@ -370,20 +370,48 @@ def salvar_turma():
     return redirect(url_for('professor.gerenciamento'))
 
 
+import os, uuid
+from werkzeug.utils import secure_filename
+from PIL import Image
+from crypto import criptografar, descriptografar, hash_senha
+ 
+FOTO_FOLDER   = os.path.join('static', 'uploads', 'fotos')
+ALLOWED_FOTOS = {'png', 'jpg', 'jpeg', 'webp'}
+ 
+def salvar_foto(arquivo):
+    if not arquivo or arquivo.filename == '':
+        return None
+    ext = arquivo.filename.rsplit('.', 1)[-1].lower()
+    if ext not in ALLOWED_FOTOS:
+        return None
+    os.makedirs(FOTO_FOLDER, exist_ok=True)
+    nome    = f"{uuid.uuid4().hex}.{ext}"
+    caminho = os.path.join(FOTO_FOLDER, nome)
+    img = Image.open(arquivo).convert('RGB')
+    img.thumbnail((200, 200))
+    img.save(caminho)
+    return nome
+ 
+
+
+ 
 @professor_bp.route('/salvar_professor', methods=['POST'])
 @login_required
 def salvar_professor():
-    f = flask_request.form
+    f    = flask_request.form
+    foto = salvar_foto(flask_request.files.get('foto'))
+ 
     conn = create_connection()
     cur  = get_cursor(conn)
     cur.execute("""
-        INSERT INTO portal_professores (nome, matricula, senha, cargo)
-        VALUES (%s, %s, %s, %s)
-    """, (f['nome'], f['matricula'], hash_senha(f['senha']), f['cargo']))
+        INSERT INTO portal_professores (nome, matricula, senha, cargo, foto)
+        VALUES (%s, %s, %s, %s, %s)
+    """, (f['nome'], f['matricula'], hash_senha(f['senha']), f['cargo'], foto))
     conn.commit()
     cur.close()
     conn.close()
     return redirect(url_for('professor.gerenciamento'))
+ 
  
 
  
@@ -392,6 +420,7 @@ def salvar_professor():
 def salvar_aluno():
     f      = flask_request.form
     turmas = flask_request.form.getlist('turmas[]')
+    foto   = salvar_foto(flask_request.files.get('foto'))
  
     conn = create_connection()
     cur  = get_cursor(conn)
@@ -405,37 +434,28 @@ def salvar_aluno():
             nome_responsavel, nascimento_responsavel, cpf_responsavel,
             rg_responsavel, telefone_responsavel,
             nome, nascimento, endereco, bairro, numero, cidade, cep,
-            matricula, senha, periodo
-        ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            matricula, senha, periodo, foto
+        ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
     """, (
-        criptografar(f['nome_responsavel']),
-        f['nascimento_responsavel'],
-        criptografar(f['cpf_responsavel']),
-        criptografar(f['rg_responsavel']),
+        criptografar(f['nome_responsavel']), f['nascimento_responsavel'],
+        criptografar(f['cpf_responsavel']), criptografar(f['rg_responsavel']),
         criptografar(f['telefone_responsavel']),
-        f['nome'],
-        f['nascimento'],
-        criptografar(f['endereco']),
-        criptografar(f['bairro']),
-        criptografar(f['numero']),
-        criptografar(f['cidade']),
+        f['nome'], f['nascimento'],
+        criptografar(f['endereco']), criptografar(f['bairro']),
+        criptografar(f['numero']), criptografar(f['cidade']),
         criptografar(f['cep']),
-        nova_matricula,
-        hash_senha(f['senha']),
-        f['periodo']
+        nova_matricula, hash_senha(f['senha']), f['periodo'], foto
     ))
     aluno_id = cur.lastrowid
  
     for turma_id in turmas:
-        cur.execute("""
-            INSERT INTO portal_aluno_turma (aluno_id, turma_id)
-            VALUES (%s, %s)
-        """, (aluno_id, turma_id))
+        cur.execute("INSERT INTO portal_aluno_turma (aluno_id, turma_id) VALUES (%s,%s)", (aluno_id, turma_id))
  
     conn.commit()
     cur.close()
     conn.close()
     return redirect(url_for('professor.gerenciamento'))
+ 
  
 
 import os
@@ -585,61 +605,64 @@ def buscar_aluno(aluno_id):
     return jsonify({'erro': 'Aluno não encontrado'}), 404
  
  
+ 
 @professor_bp.route('/editar_aluno', methods=['POST'])
 @login_required
 def editar_aluno():
     f        = flask_request.form
     aluno_id = f['aluno_id']
     turmas   = flask_request.form.getlist('turmas[]')
+    foto     = salvar_foto(flask_request.files.get('foto'))
  
     conn = create_connection()
     cur  = get_cursor(conn)
  
-    # Atualizar senha só se foi digitada
-    if f.get('senha'):
+    campos_base = (
+        criptografar(f['nome_responsavel']), f['nascimento_responsavel'],
+        criptografar(f['cpf_responsavel']), criptografar(f['rg_responsavel']),
+        criptografar(f['telefone_responsavel']),
+        f['nome'], f['nascimento'],
+        criptografar(f['endereco']), criptografar(f['bairro']),
+        criptografar(f['numero']), criptografar(f['cidade']),
+        criptografar(f['cep']), f['periodo']
+    )
+ 
+    if f.get('senha') and foto:
         cur.execute("""
             UPDATE portal_alunos SET
-                nome_responsavel = %s, nascimento_responsavel = %s,
-                cpf_responsavel = %s, rg_responsavel = %s, telefone_responsavel = %s,
-                nome = %s, nascimento = %s, endereco = %s, bairro = %s,
-                numero = %s, cidade = %s, cep = %s, periodo = %s, senha = %s
-            WHERE id = %s
-        """, (
-            criptografar(f['nome_responsavel']), f['nascimento_responsavel'],
-            criptografar(f['cpf_responsavel']), criptografar(f['rg_responsavel']),
-            criptografar(f['telefone_responsavel']),
-            f['nome'], f['nascimento'],
-            criptografar(f['endereco']), criptografar(f['bairro']),
-            criptografar(f['numero']), criptografar(f['cidade']),
-            criptografar(f['cep']), f['periodo'],
-            hash_senha(f['senha']),
-            aluno_id
-        ))
+                nome_responsavel=%s, nascimento_responsavel=%s, cpf_responsavel=%s,
+                rg_responsavel=%s, telefone_responsavel=%s, nome=%s, nascimento=%s,
+                endereco=%s, bairro=%s, numero=%s, cidade=%s, cep=%s, periodo=%s,
+                senha=%s, foto=%s WHERE id=%s
+        """, (*campos_base, hash_senha(f['senha']), foto, aluno_id))
+    elif f.get('senha'):
+        cur.execute("""
+            UPDATE portal_alunos SET
+                nome_responsavel=%s, nascimento_responsavel=%s, cpf_responsavel=%s,
+                rg_responsavel=%s, telefone_responsavel=%s, nome=%s, nascimento=%s,
+                endereco=%s, bairro=%s, numero=%s, cidade=%s, cep=%s, periodo=%s,
+                senha=%s WHERE id=%s
+        """, (*campos_base, hash_senha(f['senha']), aluno_id))
+    elif foto:
+        cur.execute("""
+            UPDATE portal_alunos SET
+                nome_responsavel=%s, nascimento_responsavel=%s, cpf_responsavel=%s,
+                rg_responsavel=%s, telefone_responsavel=%s, nome=%s, nascimento=%s,
+                endereco=%s, bairro=%s, numero=%s, cidade=%s, cep=%s, periodo=%s,
+                foto=%s WHERE id=%s
+        """, (*campos_base, foto, aluno_id))
     else:
         cur.execute("""
             UPDATE portal_alunos SET
-                nome_responsavel = %s, nascimento_responsavel = %s,
-                cpf_responsavel = %s, rg_responsavel = %s, telefone_responsavel = %s,
-                nome = %s, nascimento = %s, endereco = %s, bairro = %s,
-                numero = %s, cidade = %s, cep = %s, periodo = %s
-            WHERE id = %s
-        """, (
-            criptografar(f['nome_responsavel']), f['nascimento_responsavel'],
-            criptografar(f['cpf_responsavel']), criptografar(f['rg_responsavel']),
-            criptografar(f['telefone_responsavel']),
-            f['nome'], f['nascimento'],
-            criptografar(f['endereco']), criptografar(f['bairro']),
-            criptografar(f['numero']), criptografar(f['cidade']),
-            criptografar(f['cep']), f['periodo'],
-            aluno_id
-        ))
+                nome_responsavel=%s, nascimento_responsavel=%s, cpf_responsavel=%s,
+                rg_responsavel=%s, telefone_responsavel=%s, nome=%s, nascimento=%s,
+                endereco=%s, bairro=%s, numero=%s, cidade=%s, cep=%s, periodo=%s
+                WHERE id=%s
+        """, (*campos_base, aluno_id))
  
     cur.execute("DELETE FROM portal_aluno_turma WHERE aluno_id = %s", (aluno_id,))
     for turma_id in turmas:
-        cur.execute("""
-            INSERT INTO portal_aluno_turma (aluno_id, turma_id)
-            VALUES (%s, %s)
-        """, (aluno_id, turma_id))
+        cur.execute("INSERT INTO portal_aluno_turma (aluno_id, turma_id) VALUES (%s,%s)", (aluno_id, turma_id))
  
     conn.commit()
     cur.close()
@@ -647,40 +670,32 @@ def editar_aluno():
     return redirect(url_for('professor.gerenciamento'))
  
 
-@professor_bp.route('/buscar_professor/<int:professor_id>')
-@login_required
-def buscar_professor(professor_id):
-    conn = create_connection()
-    cur  = get_cursor(conn)
-    cur.execute("SELECT id, nome, matricula, cargo FROM portal_professores WHERE id = %s", (professor_id,))
-    professor = cur.fetchone()
-    cur.close()
-    conn.close()
-    if professor:
-        return jsonify(professor)
-    return jsonify({'erro': 'Professor não encontrado'}), 404
-
-
+ 
 @professor_bp.route('/editar_professor', methods=['POST'])
 @login_required
 def editar_professor():
     f            = flask_request.form
     professor_id = f['professor_id']
+    foto         = salvar_foto(flask_request.files.get('foto'))
  
     conn = create_connection()
     cur  = get_cursor(conn)
  
-    if f.get('senha'):
+    if f.get('senha') and foto:
         cur.execute("""
-            UPDATE portal_professores
-            SET nome = %s, matricula = %s, cargo = %s, senha = %s
-            WHERE id = %s
+            UPDATE portal_professores SET nome=%s, matricula=%s, cargo=%s, senha=%s, foto=%s WHERE id=%s
+        """, (f['nome'], f['matricula'], f['cargo'], hash_senha(f['senha']), foto, professor_id))
+    elif f.get('senha'):
+        cur.execute("""
+            UPDATE portal_professores SET nome=%s, matricula=%s, cargo=%s, senha=%s WHERE id=%s
         """, (f['nome'], f['matricula'], f['cargo'], hash_senha(f['senha']), professor_id))
+    elif foto:
+        cur.execute("""
+            UPDATE portal_professores SET nome=%s, matricula=%s, cargo=%s, foto=%s WHERE id=%s
+        """, (f['nome'], f['matricula'], f['cargo'], foto, professor_id))
     else:
         cur.execute("""
-            UPDATE portal_professores
-            SET nome = %s, matricula = %s, cargo = %s
-            WHERE id = %s
+            UPDATE portal_professores SET nome=%s, matricula=%s, cargo=%s WHERE id=%s
         """, (f['nome'], f['matricula'], f['cargo'], professor_id))
  
     conn.commit()

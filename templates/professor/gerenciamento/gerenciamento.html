@@ -270,6 +270,16 @@
           <option value="admin">Admin</option>
         </select>
       </div>
+      <div class="campo-grupo">
+        <label class="campo-label">Foto do aluno <small style="color:#94a3b8">(opcional)</small></label>
+        <label class="campo-upload">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+            <path d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+          </svg>
+          <span>Selecionar foto</span>
+          <input type="file" name="foto" accept="image/*" style="display:none"/>
+        </label>
+      </div> 
     </div>
     <div class="modal-rodape">
       <button type="button" class="btn-cancelar" onclick="fecharModal('modal-professor')">Cancelar</button>
@@ -279,7 +289,6 @@
 </div>
 
 <!-- ===== MODAL EDITAR PROFESSOR ===== -->
-<!-- Cole após o modal de novo professor no gerenciamento.html -->
 
 <div class="modal-overlay oculto" id="overlay-modal-editar-professor" onclick="fecharModal('modal-editar-professor')"></div>
 <div class="modal oculto" id="modal-editar-professor">
@@ -309,6 +318,16 @@
           <option value="admin">Admin</option>
         </select>
       </div>
+      <div class="campo-grupo">
+        <label class="campo-label">Foto do aluno <small style="color:#94a3b8">(opcional)</small></label>
+        <label class="campo-upload">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+            <path d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+          </svg>
+          <span>Selecionar foto</span>
+          <input type="file" name="foto" accept="image/*" style="display:none"/>
+        </label>
+      </div> 
     </div>
     <div class="modal-rodape">
       <button type="button" class="btn-cancelar" onclick="fecharModal('modal-editar-professor')">Cancelar</button>
@@ -411,8 +430,17 @@
         <label class="campo-label">Senha</label>
         <input type="text" class="campo-input" name="senha" placeholder="Senha de acesso" required/>
       </div>
- 
-    </div>
+      <div class="campo-grupo">
+        <label class="campo-label">Foto do aluno <small style="color:#94a3b8">(opcional)</small></label>
+        <label class="campo-upload">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+            <path d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+          </svg>
+          <span>Selecionar foto</span>
+          <input type="file" name="foto" accept="image/*" style="display:none"/>
+        </label>
+      </div> 
+    </div>    
     <div class="modal-rodape">
       <button type="button" class="btn-cancelar" onclick="fecharModal('modal-aluno')">Cancelar</button>
       <button type="submit" class="btn-enviar">Salvar</button>
@@ -516,7 +544,16 @@
         <label class="campo-label">Senha</label>
         <input type="text" class="campo-input" name="senha" id="edit-senha" required/>
       </div>
- 
+      <div class="campo-grupo">
+        <label class="campo-label">Foto do aluno <small style="color:#94a3b8">(opcional)</small></label>
+        <label class="campo-upload">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+            <path d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+          </svg>
+          <span>Selecionar foto</span>
+          <input type="file" name="foto" accept="image/*" style="display:none"/>
+        </label>
+      </div> 
     </div>
     <div class="modal-rodape">
       <button type="button" class="btn-cancelar" onclick="fecharModal('modal-editar-aluno')">Cancelar</button>
