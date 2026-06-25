@@ -115,3 +115,13 @@ function abrirModalEditar(alunoId) {
       abrirModal('modal-editar-aluno');
     });
 }
+
+// Atualiza label de qualquer input de foto
+document.addEventListener('change', function(e) {
+  if (e.target.type === 'file' && e.target.accept.includes('image')) {
+    const label = e.target.parentElement.querySelector('span');
+    if (label) {
+      label.textContent = e.target.files[0] ? e.target.files[0].name : 'Selecionar foto';
+    }
+  }
+});
