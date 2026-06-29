@@ -9,3 +9,4 @@ bcrypt
 cryptography
 python-docx
 gunicorn
+flask-limiter

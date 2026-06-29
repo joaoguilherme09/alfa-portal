@@ -1,14 +1,22 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from db import create_connection, get_cursor
-from crypto import verificar_senha, descriptografar
+from crypto import verificar_senha
 
 auth_bp = Blueprint('auth', __name__)
 
+# Rate limiter importado do app
+from app import limiter
+
 @auth_bp.route('/login/aluno', methods=['GET', 'POST'])
+@limiter.limit("10 per minute")  # máximo 10 tentativas por minuto por IP
 def login_aluno():
     if request.method == 'POST':
-        matricula = request.form.get('matricula')
-        senha     = request.form.get('senha')
+        matricula = request.form.get('matricula', '').strip()
+        senha     = request.form.get('senha', '').strip()
+
+        if not matricula or not senha:
+            flash('Preencha todos os campos.', 'error')
+            return redirect(url_for('auth.login_aluno'))
 
         conn = create_connection()
         cur  = get_cursor(conn)
@@ -32,6 +40,7 @@ def login_aluno():
 
             cursos_str = ' + '.join([c['curso'] for c in cursos_raw]) if cursos_raw else '—'
 
+            session.permanent = True
             session['perfil']    = 'aluno'
             session['id']        = aluno['id']
             session['nome']      = aluno['nome']
@@ -50,10 +59,15 @@ def login_aluno():
 
 
 @auth_bp.route('/login/professor', methods=['GET', 'POST'])
+@limiter.limit("10 per minute")  # máximo 10 tentativas por minuto por IP
 def login_professor():
     if request.method == 'POST':
-        matricula = request.form.get('matricula')
-        senha     = request.form.get('senha')
+        matricula = request.form.get('matricula', '').strip()
+        senha     = request.form.get('senha', '').strip()
+
+        if not matricula or not senha:
+            flash('Preencha todos os campos.', 'error')
+            return redirect(url_for('auth.login_professor'))
 
         conn = create_connection()
         cur  = get_cursor(conn)
@@ -66,6 +80,7 @@ def login_professor():
         conn.close()
 
         if professor and verificar_senha(senha, professor['senha']):
+            session.permanent = True
             session['perfil']    = 'professor'
             session['id']        = professor['id']
             session['nome']      = professor['nome']
@@ -84,3 +99,10 @@ def login_professor():
 def logout():
     session.clear()
     return redirect(url_for('inicial'))
+
+
+# Handler para quando o limite for excedido
+@auth_bp.errorhandler(429)
+def rate_limit_excedido(e):
+    flash('Muitas tentativas! Aguarde 1 minuto e tente novamente.', 'error')
+    return redirect(url_for('auth.login_aluno'))
