@@ -718,6 +718,20 @@ def editar_professor():
     return redirect(url_for('professor.gerenciamento'))
  
  
+@professor_bp.route('/buscar_professor/<int:professor_id>')
+@login_required
+def buscar_professor(professor_id):
+    conn = create_connection()
+    cur  = get_cursor(conn)
+    cur.execute("SELECT id, nome, matricula, cargo FROM portal_professores WHERE id = %s", (professor_id,))
+    professor = cur.fetchone()
+    cur.close()
+    conn.close()
+    if professor:
+        return jsonify(professor)
+    return jsonify({'erro': 'Professor não encontrado'}), 404
+
+
 @professor_bp.route('/buscar_turma/<int:turma_id>')
 @login_required
 def buscar_turma(turma_id):
