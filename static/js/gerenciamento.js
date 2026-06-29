@@ -57,7 +57,12 @@ function abrirModalEditar(alunoId) {
       document.getElementById('edit-cep').value                  = a.cep;
       document.getElementById('edit-senha').value                = a.senha;
       document.getElementById('edit-periodo').value              = a.periodo;
-      if (a.turma_id) document.getElementById('edit-turma').value = a.turma_id;
+
+      // Marcar turmas
+      document.querySelectorAll('.edit-turma-check').forEach(cb => {
+        cb.checked = a.turmas.includes(parseInt(cb.value));
+      });
+
       abrirModal('modal-editar-aluno');
     });
 }
@@ -80,12 +85,11 @@ function abrirModalEditarTurma(turmaId) {
   fetch(`/professor/buscar_turma/${turmaId}`)
     .then(r => r.json())
     .then(t => {
-      document.getElementById('edit-turma-id').value       = t.id;
-      document.getElementById('edit-turma-nome').value     = t.nome;
-      document.getElementById('edit-turma-curso').value    = t.curso_id;
-      document.getElementById('edit-turma-professor').value = t.professor_id;
-      document.getElementById('edit-turma-horario').value  = t.horario;
-      document.getElementById('edit-turma-periodo').value  = t.periodo;
+      document.getElementById('edit-turma-id').value      = t.id;
+      document.getElementById('edit-turma-nome').value    = t.nome;
+      document.getElementById('edit-turma-curso').value   = t.curso_id;
+      document.getElementById('edit-turma-horario').value = t.horario;
+      document.getElementById('edit-turma-periodo').value = t.periodo;
 
       // Marcar dias da semana
       const dias = t.dias_semana.split(',');
@@ -93,41 +97,16 @@ function abrirModalEditarTurma(turmaId) {
         cb.checked = dias.includes(cb.value);
       });
 
+      // Marcar professores
+      document.querySelectorAll('.edit-prof-check').forEach(cb => {
+        cb.checked = t.professores.includes(parseInt(cb.value));
+      });
+
       abrirModal('modal-editar-turma');
     });
 }
 
-// Atualiza editar aluno para marcar turmas
-function abrirModalEditar(alunoId) {
-  fetch(`/professor/buscar_aluno/${alunoId}`)
-    .then(r => r.json())
-    .then(a => {
-      document.getElementById('edit-aluno-id').value             = a.id;
-      document.getElementById('edit-nome-responsavel').value     = a.nome_responsavel;
-      document.getElementById('edit-nasc-responsavel').value     = a.nascimento_responsavel;
-      document.getElementById('edit-cpf').value                  = a.cpf_responsavel;
-      document.getElementById('edit-rg').value                   = a.rg_responsavel;
-      document.getElementById('edit-telefone').value             = a.telefone_responsavel;
-      document.getElementById('edit-nome-aluno').value           = a.nome;
-      document.getElementById('edit-nasc-aluno').value           = a.nascimento;
-      document.getElementById('edit-endereco').value             = a.endereco;
-      document.getElementById('edit-numero').value               = a.numero;
-      document.getElementById('edit-bairro').value               = a.bairro;
-      document.getElementById('edit-cidade').value               = a.cidade;
-      document.getElementById('edit-cep').value                  = a.cep;
-      document.getElementById('edit-senha').value                = a.senha;
-      document.getElementById('edit-periodo').value              = a.periodo;
-
-      // Marcar turmas
-      document.querySelectorAll('.edit-turma-check').forEach(cb => {
-        cb.checked = a.turmas.includes(parseInt(cb.value));
-      });
-
-      abrirModal('modal-editar-aluno');
-    });
-}
-
-// Atualiza label de qualquer input de foto
+// ===== FOTO =====
 document.addEventListener('change', function(e) {
   if (e.target.type === 'file' && e.target.accept.includes('image')) {
     const label = e.target.parentElement.querySelector('span');

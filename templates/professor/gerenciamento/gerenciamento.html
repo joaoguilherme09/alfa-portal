@@ -120,7 +120,9 @@
 
 </div>
 
+
 <!-- ===== MODAL NOVA TURMA ===== -->
+ 
 <div class="modal-overlay oculto" id="overlay-modal-turma" onclick="fecharModal('modal-turma')"></div>
 <div class="modal oculto" id="modal-turma">
   <div class="modal-header">
@@ -143,12 +145,15 @@
         </select>
       </div>
       <div class="campo-grupo">
-        <label class="campo-label">Professor</label>
-        <select class="campo-select" name="professor_id" required>
+        <label class="campo-label">Professores</label>
+        <div class="turmas-check">
           {% for prof in professores %}
-          <option value="{{ prof.id }}">{{ prof.nome }}</option>
+          <label class="turma-check-item">
+            <input type="checkbox" name="professor_ids[]" value="{{ prof.id }}"/>
+            {{ prof.nome }}
+          </label>
           {% endfor %}
-        </select>
+        </div>
       </div>
       <div class="campo-grupo">
         <label class="campo-label">Dias da semana</label>
@@ -177,11 +182,13 @@
     </div>
   </form>
 </div>
+ 
 
 
+ 
 <!-- ===== MODAL EDITAR TURMA ===== -->
-<!-- Cole após o modal de nova turma no gerenciamento.html -->
-
+<!-- Substitui o modal-editar-turma no gerenciamento.html -->
+ 
 <div class="modal-overlay oculto" id="overlay-modal-editar-turma" onclick="fecharModal('modal-editar-turma')"></div>
 <div class="modal oculto" id="modal-editar-turma">
   <div class="modal-header">
@@ -205,12 +212,15 @@
         </select>
       </div>
       <div class="campo-grupo">
-        <label class="campo-label">Professor</label>
-        <select class="campo-select" name="professor_id" id="edit-turma-professor" required>
+        <label class="campo-label">Professores</label>
+        <div class="turmas-check" id="edit-prof-check">
           {% for prof in professores %}
-          <option value="{{ prof.id }}">{{ prof.nome }}</option>
+          <label class="turma-check-item">
+            <input type="checkbox" name="professor_ids[]" value="{{ prof.id }}" class="edit-prof-check"/>
+            {{ prof.nome }}
+          </label>
           {% endfor %}
-        </select>
+        </div>
       </div>
       <div class="campo-grupo">
         <label class="campo-label">Dias da semana</label>
@@ -241,6 +251,7 @@
     </div>
   </form>
 </div>
+
 
 <!-- ===== MODAL NOVO PROFESSOR ===== -->
 <div class="modal-overlay oculto" id="overlay-modal-professor" onclick="fecharModal('modal-professor')"></div>

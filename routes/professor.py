@@ -195,29 +195,36 @@ def comunicados():
         turmas=turmas
     )
 
+
+
+ 
+ 
 @professor_bp.route('/gerenciamento')
 @admin_required
 def gerenciamento():
     conn = create_connection()
     cur  = get_cursor(conn)
-
+ 
     cur.execute("SELECT * FROM portal_cursos")
     cursos = cur.fetchall()
-
+ 
     cur.execute("""
-        SELECT t.*, c.nome as curso, p.nome as professor
+        SELECT t.id, t.nome, t.dias_semana, t.horario, t.periodo,
+               c.nome as curso,
+               GROUP_CONCAT(p.nome SEPARATOR ', ') as professor
         FROM portal_turmas t
         JOIN portal_cursos c ON c.id = t.curso_id
-        JOIN portal_professores p ON p.id = t.professor_id
+        LEFT JOIN portal_turma_professores tp ON tp.turma_id = t.id
+        LEFT JOIN portal_professores p ON p.id = tp.professor_id
+        GROUP BY t.id, t.nome, t.dias_semana, t.horario, t.periodo, c.nome
     """)
     turmas = cur.fetchall()
-
+ 
     cur.execute("SELECT id, nome, matricula, cargo FROM portal_professores")
     professores = cur.fetchall()
-
+ 
     cur.execute("""
-        SELECT a.id, a.nome, a.matricula,
-            MAX(c.nome) as curso
+        SELECT a.id, a.nome, a.matricula, MAX(c.nome) as curso
         FROM portal_alunos a
         LEFT JOIN portal_aluno_turma at2 ON at2.aluno_id = a.id
         LEFT JOIN portal_turmas t ON t.id = at2.turma_id
@@ -227,13 +234,10 @@ def gerenciamento():
     alunos = cur.fetchall()
     cur.close()
     conn.close()
-
+ 
     return render_template('professor/gerenciamento/gerenciamento.html',
-        cursos=cursos,
-        turmas=turmas,
-        professores=professores,
-        alunos=alunos
-    )
+        cursos=cursos, turmas=turmas, professores=professores, alunos=alunos)
+ 
 
 from flask import jsonify, request as flask_request
 import datetime
@@ -348,27 +352,44 @@ def salvar_comunicado():
 
     return redirect(url_for('professor.comunicados'))
 
+ 
+ 
 @professor_bp.route('/salvar_turma', methods=['POST'])
 @login_required
 def salvar_turma():
-    nome         = flask_request.form.get('nome')
-    curso_id     = flask_request.form.get('curso_id')
-    professor_id = flask_request.form.get('professor_id')
-    dias         = ','.join(flask_request.form.getlist('dias'))
-    horario      = flask_request.form.get('horario')
-    periodo      = flask_request.form.get('periodo')
-
+    f            = flask_request.form
+    nome         = f.get('nome')
+    curso_id     = f.get('curso_id')
+    dias         = ','.join(f.getlist('dias'))
+    horario      = f.get('horario')
+    periodo      = f.get('periodo')
+    professor_ids = f.getlist('professor_ids[]')
+ 
     conn = create_connection()
     cur  = get_cursor(conn)
+ 
+    # professor_id principal = primeiro da lista (compatibilidade)
+    professor_id_principal = professor_ids[0] if professor_ids else None
+ 
     cur.execute("""
         INSERT INTO portal_turmas (nome, curso_id, professor_id, dias_semana, horario, periodo)
         VALUES (%s, %s, %s, %s, %s, %s)
-    """, (nome, curso_id, professor_id, dias, horario, periodo))
+    """, (nome, curso_id, professor_id_principal, dias, horario, periodo))
+    turma_id = cur.lastrowid
+ 
+    # Vincular todos os professores
+    for pid in professor_ids:
+        cur.execute("""
+            INSERT IGNORE INTO portal_turma_professores (turma_id, professor_id)
+            VALUES (%s, %s)
+        """, (turma_id, pid))
+ 
     conn.commit()
     cur.close()
     conn.close()
     return redirect(url_for('professor.gerenciamento'))
-
+ 
+ 
 
 import os, uuid
 from werkzeug.utils import secure_filename
@@ -738,44 +759,63 @@ def buscar_turma(turma_id):
     conn = create_connection()
     cur  = get_cursor(conn)
     cur.execute("""
-        SELECT t.id, t.nome, t.curso_id, t.professor_id,
-               t.dias_semana, t.horario, t.periodo
+        SELECT t.id, t.nome, t.curso_id, t.dias_semana, t.horario, t.periodo
         FROM portal_turmas t
         WHERE t.id = %s
     """, (turma_id,))
     turma = cur.fetchone()
+ 
+    # Buscar todos os professores da turma
+    cur.execute("""
+        SELECT professor_id FROM portal_turma_professores WHERE turma_id = %s
+    """, (turma_id,))
+    professores = [p['professor_id'] for p in cur.fetchall()]
+ 
     cur.close()
     conn.close()
+ 
     if turma:
+        turma['professores'] = professores
         return jsonify(turma)
     return jsonify({'erro': 'Turma não encontrada'}), 404
-
+ 
+ 
+ 
 @professor_bp.route('/editar_turma', methods=['POST'])
 @login_required
 def editar_turma():
-    f = flask_request.form
-    turma_id = f['turma_id']
-    dias = ','.join(flask_request.form.getlist('dias'))
-
+    f            = flask_request.form
+    turma_id     = f['turma_id']
+    dias         = ','.join(f.getlist('dias'))
+    professor_ids = f.getlist('professor_ids[]')
+ 
+    professor_id_principal = professor_ids[0] if professor_ids else None
+ 
     conn = create_connection()
     cur  = get_cursor(conn)
+ 
     cur.execute("""
         UPDATE portal_turmas
         SET nome = %s, curso_id = %s, professor_id = %s,
             dias_semana = %s, horario = %s, periodo = %s
         WHERE id = %s
-    """, (
-        f['nome'], f['curso_id'], f['professor_id'],
-        dias, f['horario'], f['periodo'],
-        turma_id
-    ))
+    """, (f['nome'], f['curso_id'], professor_id_principal,
+          dias, f['horario'], f['periodo'], turma_id))
+ 
+    # Atualizar professores — apaga e recadastra
+    cur.execute("DELETE FROM portal_turma_professores WHERE turma_id = %s", (turma_id,))
+    for pid in professor_ids:
+        cur.execute("""
+            INSERT IGNORE INTO portal_turma_professores (turma_id, professor_id)
+            VALUES (%s, %s)
+        """, (turma_id, pid))
+ 
     conn.commit()
     cur.close()
     conn.close()
     return redirect(url_for('professor.gerenciamento'))
-
-
-# Adicione essas rotas no routes/professor.py
+ 
+ 
 
 @professor_bp.route('/chamadas_mes/<int:turma_id>/<int:ano>/<int:mes>')
 @login_required
