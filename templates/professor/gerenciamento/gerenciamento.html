@@ -307,7 +307,7 @@
     <h3>Editar Professor</h3>
     <button class="modal-fechar" onclick="fecharModal('modal-editar-professor')">✕</button>
   </div>
-  <form action="/professor/editar_professor" method="POST">
+  <form action="/professor/editar_professor" method="POST" enctype="multipart/form-data">
     <input type="hidden" name="professor_id" id="edit-prof-id"/>
     <div class="modal-corpo">
       <div class="campo-grupo">
@@ -471,7 +471,7 @@
     <h3>Editar Aluno</h3>
     <button class="modal-fechar" onclick="fecharModal('modal-editar-aluno')">✕</button>
   </div>
-  <form action="/professor/editar_aluno" method="POST">
+  <form action="/professor/editar_aluno" method="POST" enctype="multipart/form-data">
     <input type="hidden" name="aluno_id" id="edit-aluno-id"/>
     <div class="modal-corpo">
  
