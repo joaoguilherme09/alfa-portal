@@ -2,6 +2,36 @@ from flask import Blueprint, render_template, session, redirect, url_for
 from db import create_connection, get_cursor
 from datetime import date
 from crypto import criptografar, descriptografar, hash_senha
+import os
+import cloudinary
+import cloudinary.uploader
+from crypto import criptografar, descriptografar, hash_senha
+
+cloudinary.config(
+    cloud_name = os.getenv('CLOUDINARY_CLOUD_NAME'),
+    api_key    = os.getenv('CLOUDINARY_API_KEY'),
+    api_secret = os.getenv('CLOUDINARY_API_SECRET')
+)
+
+def salvar_foto(arquivo):
+    if not arquivo or arquivo.filename == '':
+        return None
+    ext = arquivo.filename.rsplit('.', 1)[-1].lower()
+    if ext not in {'png', 'jpg', 'jpeg', 'webp'}:
+        return None
+    try:
+        resultado = cloudinary.uploader.upload(
+            arquivo,
+            folder='alfa-portal/fotos',
+            transformation=[
+                {'width': 200, 'height': 200, 'crop': 'fill', 'gravity': 'face'}
+            ]
+        )
+        return resultado['secure_url']
+    except Exception as e:
+        print(f"Erro no upload Cloudinary: {e}")
+        return None
+ 
 
 professor_bp = Blueprint('professor', __name__, url_prefix='/professor')
 

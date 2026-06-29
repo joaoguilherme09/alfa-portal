@@ -18,7 +18,7 @@
 
       <div class="sidebar-avatar">
         {% if session.foto %}
-          <img src="{{ url_for('static', filename='uploads/fotos/' ~ session.foto) }}" alt="Foto"/>
+          <img src="{{ session.foto }}" alt="Foto"/>
         {% else %}
           <div class="avatar-placeholder">
             {{ session.nome[0] | upper if session.nome else 'A' }}

@@ -10,3 +10,4 @@ cryptography
 python-docx
 gunicorn
 flask-limiter
+cloudinary   
