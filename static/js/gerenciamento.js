@@ -12,6 +12,17 @@ function trocarAba(aba, botao) {
 function abrirModal(id) {
   document.getElementById('overlay-' + id).classList.remove('oculto');
   document.getElementById(id).classList.remove('oculto');
+
+  if (id === 'modal-aluno') {
+    fetch('/professor/ultima_matricula')
+      .then(r => r.json())
+      .then(data => {
+        document.getElementById('hint-matricula').textContent =
+          `Última: ${data.ultima} — Próxima sugerida: ${data.proxima}`;
+        document.getElementById('input-matricula-manual').placeholder =
+          `Sugerida: ${data.proxima}`;
+      });
+  }
 }
 
 function fecharModal(id) {

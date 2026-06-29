@@ -412,7 +412,17 @@ def salvar_professor():
     conn.close()
     return redirect(url_for('professor.gerenciamento'))
  
- 
+@professor_bp.route('/ultima_matricula')
+@login_required
+def ultima_matricula():
+    conn = create_connection()
+    cur  = get_cursor(conn)
+    cur.execute("SELECT MAX(CAST(matricula AS UNSIGNED)) as max_mat FROM portal_alunos")
+    resultado = cur.fetchone()
+    cur.close()
+    conn.close()
+    ultima = resultado['max_mat'] or 50240000
+    return jsonify({'ultima': ultima, 'proxima': ultima + 1})
 
  
 @professor_bp.route('/salvar_aluno', methods=['POST'])
@@ -427,7 +437,11 @@ def salvar_aluno():
  
     cur.execute("SELECT MAX(CAST(matricula AS UNSIGNED)) as max_mat FROM portal_alunos")
     resultado      = cur.fetchone()
-    nova_matricula = str((resultado['max_mat'] or 50240000) + 1)
+    matricula_manual = flask_request.form.get('matricula_manual', '').strip()
+    if matricula_manual:
+        nova_matricula = matricula_manual
+    else:
+        nova_matricula = str((resultado['max_mat'] or 50240000) + 1)
  
     cur.execute("""
         INSERT INTO portal_alunos (
