@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Erro interno — Portal Alfa</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+  <style>
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px 20px;
+      background: #f0f4ff;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+    .erro-codigo {
+      font-size: 8rem;
+      font-weight: 900;
+      color: #dc2626;
+      line-height: 1;
+      margin-bottom: 10px;
+    }
+    .erro-titulo {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 15px;
+    }
+    .erro-texto {
+      font-size: 1rem;
+      color: #64748b;
+      margin-bottom: 35px;
+    }
+    .erro-btn {
+      padding: 14px 28px;
+      border-radius: 12px;
+      background: #1a3a8f;
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+    .erro-btn:hover { background: #142d72; transform: translateY(-2px); }
+  </style>
+</head>
+<body>
+  <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Alfa" style="width:80px; margin-bottom:20px;">
+  <div class="erro-codigo">500</div>
+  <h1 class="erro-titulo">Algo deu errado</h1>
+  <p class="erro-texto">Ocorreu um erro interno. Tente novamente em alguns instantes.</p>
+  <a href="/" class="erro-btn">Voltar ao início</a>
+</body>
+</html>

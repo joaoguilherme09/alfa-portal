@@ -1,14 +1,19 @@
 import mysql.connector
 from mysql.connector import Error
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def create_connection():
     try:
         connection = mysql.connector.connect(
-            host="auth-db1576.hstgr.io",
-            user="u726483483_alfa_user",
-            password="Alfa25062026profissionalizantes",
-            database="u726483483_alfa_portal",
-            port=3306
+            host=os.getenv('DB_HOST'),
+            user=os.getenv('DB_USER'),
+            password=os.getenv('DB_PASSWORD'),
+            database=os.getenv('DB_NAME'),
+            port=int(os.getenv('DB_PORT', 3306)),
+            connection_timeout=10
         )
         if connection.is_connected():
             print("MYSQL CONECTADO!")
