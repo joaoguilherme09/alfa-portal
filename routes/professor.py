@@ -417,33 +417,7 @@ def salvar_turma():
     conn.commit()
     cur.close()
     conn.close()
-    return redirect(url_for('professor.gerenciamento'))
- 
- 
-
-import os, uuid
-from werkzeug.utils import secure_filename
-from PIL import Image
-from crypto import criptografar, descriptografar, hash_senha
- 
-FOTO_FOLDER   = os.path.join('static', 'uploads', 'fotos')
-ALLOWED_FOTOS = {'png', 'jpg', 'jpeg', 'webp'}
- 
-def salvar_foto(arquivo):
-    if not arquivo or arquivo.filename == '':
-        return None
-    ext = arquivo.filename.rsplit('.', 1)[-1].lower()
-    if ext not in ALLOWED_FOTOS:
-        return None
-    os.makedirs(FOTO_FOLDER, exist_ok=True)
-    nome    = f"{uuid.uuid4().hex}.{ext}"
-    caminho = os.path.join(FOTO_FOLDER, nome)
-    img = Image.open(arquivo).convert('RGB')
-    img.thumbnail((200, 200))
-    img.save(caminho)
-    return nome
- 
-
+    return redirect(url_for('professor.gerenciamento')) 
 
  
 @professor_bp.route('/salvar_professor', methods=['POST'])
