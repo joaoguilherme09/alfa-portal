@@ -390,8 +390,11 @@ def salvar_turma():
 @login_required
 def salvar_professor():
     f    = flask_request.form
+    print("ARQUIVOS RECEBIDOS:", flask_request.files)
     foto = salvar_foto(flask_request.files.get('foto'))
- 
+    print("FOTO RETORNADA:", foto)
+
+    
     conn = create_connection()
     cur  = get_cursor(conn)
     cur.execute("""
