@@ -81,10 +81,11 @@ def home():
 
     # Turmas do professor
     cur.execute("""
-        SELECT t.id, t.nome, t.dias_semana, t.horario, c.nome as curso
+        SELECT DISTINCT t.id, t.nome, t.dias_semana, t.horario, c.nome as curso
         FROM portal_turmas t
         JOIN portal_cursos c ON c.id = t.curso_id
-        WHERE t.professor_id = %s
+        JOIN portal_turma_professores tp ON tp.turma_id = t.id
+        WHERE tp.professor_id = %s
     """, (professor_id,))
     todas_turmas = cur.fetchall()
 
@@ -123,10 +124,11 @@ def notas():
     cur  = get_cursor(conn)
 
     cur.execute("""
-        SELECT t.id, t.nome, c.nome as curso
+        SELECT DISTINCT t.id, t.nome, t.dias_semana, t.horario, c.nome as curso
         FROM portal_turmas t
         JOIN portal_cursos c ON c.id = t.curso_id
-        WHERE t.professor_id = %s
+        JOIN portal_turma_professores tp ON tp.turma_id = t.id
+        WHERE tp.professor_id = %s
     """, (professor_id,))
     turmas = cur.fetchall()
     cur.close()
@@ -145,10 +147,11 @@ def faltas():
     cur  = get_cursor(conn)
 
     cur.execute("""
-        SELECT t.id, t.nome, t.dias_semana, t.horario, c.nome as curso
+        SELECT DISTINCT t.id, t.nome, t.dias_semana, t.horario, c.nome as curso
         FROM portal_turmas t
         JOIN portal_cursos c ON c.id = t.curso_id
-        WHERE t.professor_id = %s
+        JOIN portal_turma_professores tp ON tp.turma_id = t.id
+        WHERE tp.professor_id = %s
     """, (professor_id,))
     turmas = cur.fetchall()
     cur.close()
@@ -217,7 +220,7 @@ def gerenciamento():
  
     cur.execute("""
         SELECT a.id, a.nome, a.matricula, a.foto,
-            GROUP_CONCAT(DISTINCT c.nome SEPARATOR ' + ') as curso
+            GROUP_CONCAT(DISTINCT c.nome SEPARATOR ' , ') as curso
         FROM portal_alunos a
         LEFT JOIN portal_aluno_turma at2 ON at2.aluno_id = a.id
         LEFT JOIN portal_turmas t ON t.id = at2.turma_id
