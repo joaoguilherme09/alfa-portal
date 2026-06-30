@@ -21,7 +21,7 @@ def descriptografar(valor):
         f = get_fernet()
         return f.decrypt(str(valor).encode()).decode()
     except Exception:
-        return valor  # retorna original se não conseguir descriptografar
+        return valor 
 
 def hash_senha(senha):
     return bcrypt.hashpw(senha.encode(), bcrypt.gensalt()).decode()

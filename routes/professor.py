@@ -156,44 +156,6 @@ def faltas():
 
     return render_template('professor/faltas/faltas.html', turmas=turmas)
 
-@professor_bp.route('/faltas/alunos/<int:turma_id>')
-@login_required
-def faltas_alunos(turma_id):
-    professor_id = session['id']
-    hoje = date.today()
-
-    conn = create_connection()
-    cur  = get_cursor(conn)
-
-    # Dados da turma
-    cur.execute("""
-        SELECT t.nome, t.horario, c.nome as curso
-        FROM portal_turmas t
-        JOIN portal_cursos c ON c.id = t.curso_id
-        WHERE t.id = %s
-    """, (turma_id,))
-    turma = cur.fetchone()
-
-    # Alunos da turma
-    cur.execute("""
-        SELECT a.id, a.nome, a.foto,
-            (SELECT COUNT(*) FROM portal_chamadas
-             WHERE aluno_id = a.id AND turma_id = %s
-             AND status = 'F' AND MONTH(data_aula) = MONTH(NOW())) as faltas_mes
-        FROM portal_aluno_turma at2
-        JOIN portal_alunos a ON a.id = at2.aluno_id
-        WHERE at2.turma_id = %s
-    """, (turma_id, turma_id))
-    alunos = cur.fetchall()
-    cur.close()
-    conn.close()
-
-    return render_template('professor/faltas/chamada.html',
-        turma=turma,
-        turma_id=turma_id,
-        alunos=alunos,
-        hoje=hoje.strftime('%d/%m/%Y')
-    )
 
 @professor_bp.route('/comunicados')
 @login_required
@@ -844,7 +806,7 @@ def alunos_chamada(turma_id, data):
     conn = create_connection()
     cur  = get_cursor(conn)
     cur.execute("""
-        SELECT a.id, a.nome,
+        SELECT a.id, a.nome, a.foto,
             COALESCE(
                 (SELECT status FROM portal_chamadas
                  WHERE aluno_id = a.id AND turma_id = %s AND data_aula = %s),

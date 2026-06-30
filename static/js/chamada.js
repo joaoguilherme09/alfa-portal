@@ -105,8 +105,8 @@ function abrirChamada(dataStr, dia, jaFeita) {
         lista.innerHTML += `
           <div class="card-chamada" id="card-${a.id}">
             <div class="chamada-aluno-info">
-              <div class="aluno-avatar">${a.nome[0]}</div>
-              <div>
+              ${a.foto ? `<img src="${a.foto}" class="aluno-avatar-foto"/>` : `<div class="aluno-avatar">${a.nome[0]}</div>`}
+                    <div>
                 <p class="aluno-nome">${a.nome}</p>
                 <p class="aluno-faltas-mes">${a.faltas_mes} falta${a.faltas_mes !== 1 ? 's' : ''} no mês</p>
               </div>
