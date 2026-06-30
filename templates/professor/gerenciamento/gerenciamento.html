@@ -72,7 +72,11 @@
         {% for prof in professores %}
         <div class="card-ger">
           <div class="card-ger-esquerda">
+            {% if prof.foto %}
+            <img src="{{ prof.foto }}" class="aluno-avatar-foto"/>
+            {% else %}
             <div class="aluno-avatar">{{ prof.nome[0] }}</div>
+            {% endif %}
             <div class="card-ger-info">
               <p class="card-ger-titulo">{{ prof.nome }}</p>
               <p class="card-ger-sub">Matrícula: {{ prof.matricula }} — {{ prof.cargo | capitalize }}</p>

@@ -215,7 +215,7 @@ def gerenciamento():
     """)
     turmas = cur.fetchall()
  
-    cur.execute("SELECT id, nome, matricula, cargo FROM portal_professores")
+    cur.execute("SELECT id, nome, matricula, cargo, foto FROM portal_professores")
     professores = cur.fetchall()
  
     cur.execute("""
