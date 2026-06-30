@@ -221,7 +221,7 @@ def gerenciamento():
         LEFT JOIN portal_aluno_turma at2 ON at2.aluno_id = a.id
         LEFT JOIN portal_turmas t ON t.id = at2.turma_id
         LEFT JOIN portal_cursos c ON c.id = t.curso_id
-        GROUP BY a.id, a.nome, a.matricula
+        GROUP BY a.id, a.nome, a.matricula, a.foto
     """)
     alunos = cur.fetchall()
     cur.close()
