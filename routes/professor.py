@@ -216,7 +216,8 @@ def gerenciamento():
     professores = cur.fetchall()
  
     cur.execute("""
-        SELECT a.id, a.nome, a.matricula, a.foto, MAX(c.nome) as curso
+        SELECT a.id, a.nome, a.matricula, a.foto,
+            GROUP_CONCAT(DISTINCT c.nome SEPARATOR ' + ') as curso
         FROM portal_alunos a
         LEFT JOIN portal_aluno_turma at2 ON at2.aluno_id = a.id
         LEFT JOIN portal_turmas t ON t.id = at2.turma_id
