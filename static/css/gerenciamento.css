@@ -502,3 +502,11 @@ a.card-curso-ger:hover {
 }
 
 .btn-voltar:hover { opacity: 0.7; }
+
+
+.aluno-avatar-foto {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}

@@ -216,7 +216,7 @@ def gerenciamento():
     professores = cur.fetchall()
  
     cur.execute("""
-        SELECT a.id, a.nome, a.matricula, MAX(c.nome) as curso
+        SELECT a.id, a.nome, a.matricula, a.foto, MAX(c.nome) as curso
         FROM portal_alunos a
         LEFT JOIN portal_aluno_turma at2 ON at2.aluno_id = a.id
         LEFT JOIN portal_turmas t ON t.id = at2.turma_id
@@ -862,7 +862,7 @@ def turma_alunos(turma_id):
     """, (turma_id,))
     turma = cur.fetchone()
     cur.execute("""
-        SELECT a.id, a.nome, a.matricula, a.periodo,
+        SELECT a.id, a.nome, a.matricula, a.periodo, a.foto,
                (SELECT COUNT(*) FROM portal_chamadas
                 WHERE aluno_id = a.id AND turma_id = %s
                 AND status = 'F' AND MONTH(data_aula) = MONTH(NOW())) as faltas_mes

@@ -100,7 +100,15 @@
         {% for aluno in alunos %}
         <div class="card-ger">
           <div class="card-ger-esquerda">
+            {% if aluno.foto %}
+            <img src="{{ aluno.foto }}" class="aluno-avatar-foto"/>
+            {% else %}
+            {% if aluno.foto %}
+            <img src="{{ aluno.foto }}" class="aluno-avatar-foto"/>
+            {% else %}
             <div class="aluno-avatar">{{ aluno.nome[0] }}</div>
+            {% endif %}
+            {% endif %}
             <div class="card-ger-info">
               <p class="card-ger-titulo">{{ aluno.nome }}</p>
               <p class="card-ger-sub">Matrícula: {{ aluno.matricula }}{% if aluno.curso %} — {{ aluno.curso }}{% endif %}</p>
