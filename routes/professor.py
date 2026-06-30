@@ -389,12 +389,9 @@ def salvar_turma():
 @professor_bp.route('/salvar_professor', methods=['POST'])
 @login_required
 def salvar_professor():
-    f    = flask_request.form
-    print("ARQUIVOS RECEBIDOS:", flask_request.files)
+    f    = flask_request.form    
     foto = salvar_foto(flask_request.files.get('foto'))
-    print("FOTO RETORNADA:", foto)
 
-    
     conn = create_connection()
     cur  = get_cursor(conn)
     cur.execute("""
