@@ -114,7 +114,7 @@
       </svg>
       <span style="font-size:.85rem; font-weight:600; color:#64748b;">Filtrar por</span>
 
-      <input type="text" id="filtro-nome" class="filtro-input" placeholder="Nome do aluno ou matrícula"/>
+      <input type="text" id="filtro-nome" class="filtro-input" placeholder="Nome ou matrícula"/>
 
       <select id="filtro-curso" class="filtro-select">
         <option value="">🎓 Curso</option>
@@ -130,6 +130,16 @@
         <option value="Noite">Noite</option>
       </select>
 
+      <select id="filtro-dia" class="filtro-select">
+        <option value="">📆 Dia</option>
+        <option value="Segunda">Segunda</option>
+        <option value="Terça">Terça</option>
+        <option value="Quarta">Quarta</option>
+        <option value="Quinta">Quinta</option>
+        <option value="Sexta">Sexta</option>
+        <option value="Sábado">Sábado</option>
+      </select>
+
       <button class="btn-filtro-limpar" onclick="limparFiltros()">Limpar</button>
       <button class="btn-filtro-buscar" onclick="filtrarAlunos()">Buscar</button>
     </div>
@@ -137,20 +147,16 @@
     <div class="lista-ger">
       {% if alunos %}
         {% for aluno in alunos %}
-        <div class="card-ger">
+        <div class="card-ger" data-dias="{{ aluno.dias_semana if aluno.dias_semana else '' }}">
           <div class="card-ger-esquerda">
-            {% if aluno.foto %}
-            <img src="{{ aluno.foto }}" class="aluno-avatar-foto"/>
-            {% else %}
             {% if aluno.foto %}
             <img src="{{ aluno.foto }}" class="aluno-avatar-foto"/>
             {% else %}
             <div class="aluno-avatar">{{ aluno.nome[0] }}</div>
             {% endif %}
-            {% endif %}
             <div class="card-ger-info">
               <p class="card-ger-titulo">{{ aluno.nome }}</p>
-              <p class="card-ger-sub">Matrícula: {{ aluno.matricula }}{% if aluno.curso %} — {{ aluno.curso }}{% endif %}</p>
+              <p class="card-ger-sub">Matrícula: {{ aluno.matricula }}{% if aluno.curso %} — {{ aluno.curso }}{% endif %}{% if aluno.periodo %} — {{ aluno.periodo }}{% endif %}</p>
             </div>
           </div>
           <div class="card-ger-acoes">
@@ -158,6 +164,8 @@
             <button class="btn-acao matricula" onclick="abrirModalMatricula({{ aluno.id }}, '{{ aluno.nome }}')">Matrícula</button>
             <button class="btn-acao desativar" onclick="confirmarDesativar({{ aluno.id }}, '{{ aluno.nome }}')">Desativar</button>
           </div>
+        </div>
+          
         </div>
         {% endfor %}
       {% else %}

@@ -131,11 +131,14 @@ function confirmarDesativar(alunoId, nomeAluno) {
 }
 
 
+
+
 // ===== FILTROS DE ALUNOS =====
 function filtrarAlunos() {
-  const nome    = document.getElementById('filtro-nome').value.toLowerCase();
+  const nome    = document.getElementById('filtro-nome').value.toLowerCase().trim();
   const curso   = document.getElementById('filtro-curso').value.toLowerCase();
   const periodo = document.getElementById('filtro-periodo').value.toLowerCase();
+  const dia     = document.getElementById('filtro-dia').value.toLowerCase();
 
   document.querySelectorAll('#painel-alunos .card-ger').forEach(card => {
     const titulo = card.querySelector('.card-ger-titulo').textContent.toLowerCase();
@@ -144,8 +147,9 @@ function filtrarAlunos() {
     const matchNome    = !nome    || titulo.includes(nome) || sub.includes(nome);
     const matchCurso   = !curso   || sub.includes(curso);
     const matchPeriodo = !periodo || sub.includes(periodo);
+    const matchDia     = !dia     || card.dataset.dias?.toLowerCase().includes(dia);
 
-    card.style.display = (matchNome && matchCurso && matchPeriodo) ? '' : 'none';
+    card.style.display = (matchNome && matchCurso && matchPeriodo && matchDia) ? '' : 'none';
   });
 }
 
@@ -153,6 +157,7 @@ function limparFiltros() {
   document.getElementById('filtro-nome').value    = '';
   document.getElementById('filtro-curso').value   = '';
   document.getElementById('filtro-periodo').value = '';
+  document.getElementById('filtro-dia').value     = '';
   document.querySelectorAll('#painel-alunos .card-ger').forEach(card => {
     card.style.display = '';
   });

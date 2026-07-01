@@ -219,14 +219,15 @@ def gerenciamento():
     professores = cur.fetchall()
  
     cur.execute("""
-        SELECT a.id, a.nome, a.matricula, a.foto,
-            GROUP_CONCAT(DISTINCT c.nome SEPARATOR ' , ') as curso
+        SELECT a.id, a.nome, a.matricula, a.foto, a.periodo,
+            GROUP_CONCAT(DISTINCT c.nome SEPARATOR ' , ') as curso,
+            GROUP_CONCAT(DISTINCT t.dias_semana SEPARATOR ',') as dias_semana
         FROM portal_alunos a
         LEFT JOIN portal_aluno_turma at2 ON at2.aluno_id = a.id
         LEFT JOIN portal_turmas t ON t.id = at2.turma_id
         LEFT JOIN portal_cursos c ON c.id = t.curso_id
         WHERE a.ativo = 1 OR a.ativo IS NULL
-        GROUP BY a.id, a.nome, a.matricula, a.foto
+        GROUP BY a.id, a.nome, a.matricula, a.foto, a.periodo
     """)
     alunos = cur.fetchall()
     cur.close()
