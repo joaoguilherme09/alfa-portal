@@ -4,11 +4,10 @@ from crypto import verificar_senha
 
 auth_bp = Blueprint('auth', __name__)
 
-# Rate limiter importado do app
-from app import limiter
+
 
 @auth_bp.route('/login/aluno', methods=['GET', 'POST'])
-@limiter.limit("10 per minute")  # máximo 10 tentativas por minuto por IP
+
 def login_aluno():
     if request.method == 'POST':
         matricula = request.form.get('matricula', '').strip()
@@ -64,7 +63,7 @@ def login_aluno():
 
 
 @auth_bp.route('/login/professor', methods=['GET', 'POST'])
-@limiter.limit("10 per minute")  # máximo 10 tentativas por minuto por IP
+
 def login_professor():
     if request.method == 'POST':
         matricula = request.form.get('matricula', '').strip()
