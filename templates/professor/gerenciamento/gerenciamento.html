@@ -106,6 +106,34 @@
         <button class="btn-cadastrar" onclick="abrirModal('modal-aluno')">+ Cadastrar Aluno</button>
       </div>
     </div>
+
+    <!-- ===== FILTROS ALUNOS ===== -->
+    <div class="filtros-alunos">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16" style="color:#64748b">
+        <path d="M4.25 5.61C6.27 8.2 10 13 10 13v6c0 .55.45 1 1 1h2c.55 0 1-.45 1-1v-6s3.72-4.8 5.74-7.39A.998.998 0 0 0 18.95 4H5.04a1 1 0 0 0-.79 1.61z"/>
+      </svg>
+      <span style="font-size:.85rem; font-weight:600; color:#64748b;">Filtrar por</span>
+
+      <input type="text" id="filtro-nome" class="filtro-input" placeholder="Nome do aluno ou matrícula"/>
+
+      <select id="filtro-curso" class="filtro-select">
+        <option value="">🎓 Curso</option>
+        {% for curso in cursos %}
+        <option value="{{ curso.nome }}">{{ curso.nome }}</option>
+        {% endfor %}
+      </select>
+
+      <select id="filtro-periodo" class="filtro-select">
+        <option value="">📅 Período</option>
+        <option value="Manhã">Manhã</option>
+        <option value="Tarde">Tarde</option>
+        <option value="Noite">Noite</option>
+      </select>
+
+      <button class="btn-filtro-limpar" onclick="limparFiltros()">Limpar</button>
+      <button class="btn-filtro-buscar" onclick="filtrarAlunos()">Buscar</button>
+    </div>
+
     <div class="lista-ger">
       {% if alunos %}
         {% for aluno in alunos %}

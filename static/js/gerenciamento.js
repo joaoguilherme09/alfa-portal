@@ -129,3 +129,31 @@ function confirmarDesativar(alunoId, nomeAluno) {
       });
   }
 }
+
+
+// ===== FILTROS DE ALUNOS =====
+function filtrarAlunos() {
+  const nome    = document.getElementById('filtro-nome').value.toLowerCase();
+  const curso   = document.getElementById('filtro-curso').value.toLowerCase();
+  const periodo = document.getElementById('filtro-periodo').value.toLowerCase();
+
+  document.querySelectorAll('#painel-alunos .card-ger').forEach(card => {
+    const titulo = card.querySelector('.card-ger-titulo').textContent.toLowerCase();
+    const sub    = card.querySelector('.card-ger-sub').textContent.toLowerCase();
+
+    const matchNome    = !nome    || titulo.includes(nome) || sub.includes(nome);
+    const matchCurso   = !curso   || sub.includes(curso);
+    const matchPeriodo = !periodo || sub.includes(periodo);
+
+    card.style.display = (matchNome && matchCurso && matchPeriodo) ? '' : 'none';
+  });
+}
+
+function limparFiltros() {
+  document.getElementById('filtro-nome').value    = '';
+  document.getElementById('filtro-curso').value   = '';
+  document.getElementById('filtro-periodo').value = '';
+  document.querySelectorAll('#painel-alunos .card-ger').forEach(card => {
+    card.style.display = '';
+  });
+}

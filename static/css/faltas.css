@@ -675,3 +675,68 @@
   border-radius: 50%;
   object-fit: cover;
 }
+
+
+/* ===== FILTROS ===== */
+.filtros-alunos {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 12px 16px;
+  background: #f8faff;
+  border-radius: 10px;
+  border: 1px solid #e8eef8;
+  margin-bottom: 16px;
+}
+
+.filtro-input {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  font-size: 0.85rem;
+  width: 200px;
+  outline: none;
+}
+
+.filtro-input:focus { border-color: #1a3a8f; }
+
+.filtro-select {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  font-size: 0.85rem;
+  background: white;
+  outline: none;
+  cursor: pointer;
+}
+
+.filtro-select:focus { border-color: #1a3a8f; }
+
+.btn-filtro-limpar {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: white;
+  color: #64748b;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-filtro-limpar:hover { background: #f1f5f9; }
+
+.btn-filtro-buscar {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  background: #1a3a8f;
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-filtro-buscar:hover { background: #142d72; }
