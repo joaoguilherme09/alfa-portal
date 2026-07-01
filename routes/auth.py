@@ -21,7 +21,7 @@ def login_aluno():
         conn = create_connection()
         cur  = get_cursor(conn)
         cur.execute("""
-            SELECT id, nome, matricula, senha, periodo, foto
+            SELECT id, nome, matricula, senha, periodo, foto, ativo
             FROM portal_alunos WHERE matricula = %s
         """, (matricula,))
         aluno = cur.fetchone()
@@ -29,6 +29,8 @@ def login_aluno():
         if aluno and verificar_senha(senha, aluno['senha']):
             if aluno.get('ativo') == 0:
                 flash('Sua conta foi desativada. Entre em contato com a escola.', 'error')
+                cur.close()
+                conn.close()
                 return redirect(url_for('auth.login_aluno'))
             cur.execute("""
                 SELECT DISTINCT c.nome as curso
