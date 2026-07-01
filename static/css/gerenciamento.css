@@ -510,3 +510,33 @@ a.card-curso-ger:hover {
   border-radius: 50%;
   object-fit: cover;
 }
+
+
+
+
+.btn-acao.desativar {
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fca5a5;
+}
+
+.btn-acao.desativar:hover {
+  background: #dc2626;
+  color: white;
+}
+
+.btn-visualizar-desativados {
+  padding: 8px 16px;
+  border-radius: 8px;
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-visualizar-desativados:hover {
+  background: #e2e8f0;
+}

@@ -225,6 +225,7 @@ def gerenciamento():
         LEFT JOIN portal_aluno_turma at2 ON at2.aluno_id = a.id
         LEFT JOIN portal_turmas t ON t.id = at2.turma_id
         LEFT JOIN portal_cursos c ON c.id = t.curso_id
+        WHERE a.ativo = 1 OR a.ativo IS NULL
         GROUP BY a.id, a.nome, a.matricula, a.foto
     """)
     alunos = cur.fetchall()
@@ -880,3 +881,51 @@ def turma_alunos(turma_id):
     conn.close()
     return render_template('professor/gerenciamento/turma_alunos.html',
         turma=turma, alunos=alunos, turma_id=turma_id)
+
+
+
+
+
+
+
+@professor_bp.route('/desativar_aluno/<int:aluno_id>', methods=['POST'])
+@admin_required
+def desativar_aluno(aluno_id):
+    conn = create_connection()
+    cur  = get_cursor(conn)
+    cur.execute("UPDATE portal_alunos SET ativo = 0 WHERE id = %s", (aluno_id,))
+    conn.commit()
+    cur.close()
+    conn.close()
+    return jsonify({'ok': True})
+
+@professor_bp.route('/ativar_aluno/<int:aluno_id>', methods=['POST'])
+@admin_required
+def ativar_aluno(aluno_id):
+    conn = create_connection()
+    cur  = get_cursor(conn)
+    cur.execute("UPDATE portal_alunos SET ativo = 1 WHERE id = %s", (aluno_id,))
+    conn.commit()
+    cur.close()
+    conn.close()
+    return jsonify({'ok': True})
+
+@professor_bp.route('/alunos_desativados')
+@admin_required
+def alunos_desativados():
+    conn = create_connection()
+    cur  = get_cursor(conn)
+    cur.execute("""
+        SELECT a.id, a.nome, a.matricula, a.foto,
+            GROUP_CONCAT(DISTINCT c.nome SEPARATOR ' , ') as curso
+        FROM portal_alunos a
+        LEFT JOIN portal_aluno_turma at2 ON at2.aluno_id = a.id
+        LEFT JOIN portal_turmas t ON t.id = at2.turma_id
+        LEFT JOIN portal_cursos c ON c.id = t.curso_id
+        WHERE a.ativo = 0
+        GROUP BY a.id, a.nome, a.matricula, a.foto
+    """)
+    alunos = cur.fetchall()
+    cur.close()
+    conn.close()
+    return render_template('professor/gerenciamento/alunos_desativados.html', alunos=alunos)

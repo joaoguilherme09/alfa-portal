@@ -99,7 +99,12 @@
   <div class="painel-aba oculto" id="painel-alunos">
     <div class="secao-topo">
       <h3 class="secao-titulo">Alunos cadastrados</h3>
-      <button class="btn-cadastrar" onclick="abrirModal('modal-aluno')">+ Cadastrar Aluno</button>
+      <div style="display:flex; gap:10px;">
+        <button class="btn-visualizar-desativados" onclick="window.location.href='/professor/alunos_desativados'">
+          👁 Visualizar desativados
+        </button>
+        <button class="btn-cadastrar" onclick="abrirModal('modal-aluno')">+ Cadastrar Aluno</button>
+      </div>
     </div>
     <div class="lista-ger">
       {% if alunos %}
@@ -123,6 +128,7 @@
           <div class="card-ger-acoes">
             <button class="btn-acao editar" onclick="abrirModalEditar({{ aluno.id }})">Editar</button>
             <button class="btn-acao matricula" onclick="abrirModalMatricula({{ aluno.id }}, '{{ aluno.nome }}')">Matrícula</button>
+            <button class="btn-acao desativar" onclick="confirmarDesativar({{ aluno.id }}, '{{ aluno.nome }}')">Desativar</button>
           </div>
         </div>
         {% endfor %}

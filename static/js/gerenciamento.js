@@ -115,3 +115,17 @@ document.addEventListener('change', function(e) {
     }
   }
 });
+
+
+function confirmarDesativar(alunoId, nomeAluno) {
+  if (confirm(`Deseja realmente desativar o aluno "${nomeAluno}"? Ele não conseguirá mais acessar o portal.`)) {
+    fetch(`/professor/desativar_aluno/${alunoId}`, { method: 'POST' })
+      .then(r => r.json())
+      .then(data => {
+        if (data.ok) {
+          alert('Aluno desativado com sucesso!');
+          location.reload();
+        }
+      });
+  }
+}

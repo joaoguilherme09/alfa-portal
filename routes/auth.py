@@ -27,6 +27,9 @@ def login_aluno():
         aluno = cur.fetchone()
 
         if aluno and verificar_senha(senha, aluno['senha']):
+            if aluno.get('ativo') == 0:
+                flash('Sua conta foi desativada. Entre em contato com a escola.', 'error')
+                return redirect(url_for('auth.login_aluno'))
             cur.execute("""
                 SELECT DISTINCT c.nome as curso
                 FROM portal_aluno_turma at2
@@ -106,3 +109,5 @@ def logout():
 def rate_limit_excedido(e):
     flash('Muitas tentativas! Aguarde 1 minuto e tente novamente.', 'error')
     return redirect(url_for('auth.login_aluno'))
+
+
