@@ -188,7 +188,7 @@ def notificacoes():
 
     # Faltas dos últimos 7 dias
     cur.execute("""
-        SELECT DATE_FORMAT(data_aula, '%%d/%%m') as data, t.nome as turma
+        SELECT DATE_FORMAT(data_aula, '%d/%m') as data, t.nome as turma
         FROM portal_chamadas c
         JOIN portal_turmas t ON t.id = c.turma_id
         WHERE c.aluno_id = %s AND c.status = 'F'
@@ -201,7 +201,7 @@ def notificacoes():
     if turmas:
         formato = ','.join(['%s'] * len(turmas))
         cur.execute(f"""
-            SELECT titulo, DATE_FORMAT(criado_em, '%%d/%%m') as data
+            SELECT titulo, DATE_FORMAT(criado_em, '%d/%m') as data
             FROM portal_comunicados
             WHERE ((tipo = 'turma' AND turma_id IN ({formato}))
                OR (tipo = 'aluno' AND aluno_id = %s))
@@ -210,7 +210,7 @@ def notificacoes():
         """, (*turmas, aluno_id))
     else:
         cur.execute("""
-            SELECT titulo, DATE_FORMAT(criado_em, '%%d/%%m') as data
+            SELECT titulo, DATE_FORMAT(criado_em, '%d/%m') as data
             FROM portal_comunicados
             WHERE tipo = 'aluno' AND aluno_id = %s
             AND criado_em >= DATE_SUB(NOW(), INTERVAL 7 DAY)
