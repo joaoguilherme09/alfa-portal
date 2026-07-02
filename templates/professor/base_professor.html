@@ -100,7 +100,22 @@
       </button>
       <h2 class="pagina-titulo">{% block pagina_titulo %}Home{% endblock %}</h2>
       <div class="header-acoes">
-        <button class="btn-sino" aria-label="Notificações">
+        
+        <div class="header-acoes">
+          <div class="sino-wrapper" id="sino-wrapper">
+            <button class="btn-sino" aria-label="Notificações" onclick="toggleSinoProfessor()">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+                <path d="M12 22a2 2 0 0 0 2-2h-4a2 2 0 0 0 2 2zm6-6V11a6 6 0 0 0-5-5.91V4a1 1 0 0 0-2 0v1.09A6 6 0 0 0 6 11v5l-2 2v1h16v-1l-2-2z"/>
+              </svg>
+              <span class="sino-badge" id="sino-badge" style="display:none">0</span>
+            </button>
+            <div class="sino-dropdown oculto" id="sino-dropdown">
+              <div class="sino-header">🔔 Notificações</div>
+              <div id="sino-conteudo"></div>
+            </div>
+          </div>
+        </div>
+
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
             <path d="M12 22a2 2 0 0 0 2-2h-4a2 2 0 0 0 2 2zm6-6V11a6 6 0 0 0-5-5.91V4a1 1 0 0 0-2 0v1.09A6 6 0 0 0 6 11v5l-2 2v1h16v-1l-2-2z"/>
           </svg>

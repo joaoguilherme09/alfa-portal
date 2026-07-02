@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, session, redirect, url_for
+from flask import Blueprint, render_template, session, redirect, url_for, jsonify
 from db import create_connection, get_cursor
 from datetime import date
 from crypto import criptografar, descriptografar, hash_senha
@@ -930,3 +930,53 @@ def alunos_desativados():
     cur.close()
     conn.close()
     return render_template('professor/gerenciamento/alunos_desativados.html', alunos=alunos)
+
+
+
+@professor_bp.route('/notificacoes')
+@login_required
+def notificacoes():
+    professor_id = session['id']
+    hoje = date.today()
+
+    conn = create_connection()
+    cur  = get_cursor(conn)
+
+    # Alunos com 3+ faltas no mês nas turmas do professor
+    cur.execute("""
+        SELECT a.nome, COUNT(*) as total_faltas, t.nome as turma
+        FROM portal_chamadas c
+        JOIN portal_alunos a ON a.id = c.aluno_id
+        JOIN portal_turmas t ON t.id = c.turma_id
+        JOIN portal_turma_professores tp ON tp.turma_id = t.id
+        WHERE tp.professor_id = %s AND c.status = 'F'
+        AND MONTH(c.data_aula) = MONTH(NOW())
+        AND YEAR(c.data_aula) = YEAR(NOW())
+        GROUP BY a.id, a.nome, t.nome
+        HAVING COUNT(*) >= 3
+        LIMIT 5
+    """, (professor_id,))
+    faltas = cur.fetchall()
+
+    # Turmas sem chamada hoje
+    cur.execute("""
+        SELECT DISTINCT t.nome as turma
+        FROM portal_turmas t
+        JOIN portal_turma_professores tp ON tp.turma_id = t.id
+        WHERE tp.professor_id = %s
+        AND t.id NOT IN (
+            SELECT DISTINCT turma_id FROM portal_chamadas
+            WHERE DATE(data_aula) = %s
+        )
+    """, (professor_id, hoje))
+    sem_chamada = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    total = len(faltas) + len(sem_chamada)
+    return jsonify({
+        'total': total,
+        'faltas': [dict(f) for f in faltas],
+        'sem_chamada': [dict(s) for s in sem_chamada]
+    })

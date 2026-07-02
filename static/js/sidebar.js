@@ -85,3 +85,64 @@ document.addEventListener('click', function(e) {
     document.getElementById('sino-dropdown')?.classList.add('oculto');
   }
 });
+
+
+
+
+let notificacoesProfCarregadas = false;
+
+function toggleSinoProfessor() {
+  const dropdown = document.getElementById('sino-dropdown');
+  const badge = document.getElementById('sino-badge');
+
+  if (dropdown.classList.contains('oculto')) {
+    dropdown.classList.remove('oculto');
+    if (!notificacoesProfCarregadas) {
+      carregarNotificacoesProfessor();
+      notificacoesProfCarregadas = true;
+    }
+  } else {
+    dropdown.classList.add('oculto');
+    if (badge) {
+      badge.style.display = 'none';
+      badge.textContent = '0';
+    }
+    notificacoesProfCarregadas = false;
+  }
+}
+
+function carregarNotificacoesProfessor() {
+  fetch('/professor/notificacoes')
+    .then(r => r.json())
+    .then(data => {
+      const badge = document.getElementById('sino-badge');
+      const conteudo = document.getElementById('sino-conteudo');
+
+      if (data.total > 0) {
+        badge.style.display = 'flex';
+        badge.textContent = data.total;
+      }
+
+      let html = '';
+
+      data.faltas.forEach(f => {
+        html += `<div class="sino-item">
+          <span class="sino-item-icone">⚠️</span>
+          <div class="sino-item-texto">
+            <strong>${f.nome}</strong> tem ${f.total_faltas} faltas em ${f.turma}
+          </div>
+        </div>`;
+      });
+
+      data.sem_chamada.forEach(s => {
+        html += `<div class="sino-item">
+          <span class="sino-item-icone">📋</span>
+          <div class="sino-item-texto">
+            Chamada não feita hoje em <strong>${s.turma}</strong>
+          </div>
+        </div>`;
+      });
+
+      conteudo.innerHTML = html || '<p class="sino-vazio">Nenhuma notificação.</p>';
+    });
+}
