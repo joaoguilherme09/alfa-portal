@@ -815,15 +815,15 @@ def alunos_chamada(turma_id, data):
         SELECT a.id, a.nome, a.foto,
             COALESCE(
                 (SELECT status FROM portal_chamadas
-                 WHERE aluno_id = a.id AND turma_id = %s AND data_aula = %s),
+                WHERE aluno_id = a.id AND turma_id = %s AND data_aula = %s),
                 'P'
             ) as status,
             (SELECT COUNT(*) FROM portal_chamadas
-             WHERE aluno_id = a.id AND turma_id = %s
-             AND status = 'F' AND MONTH(data_aula) = MONTH(%s)) as faltas_mes
+            WHERE aluno_id = a.id AND turma_id = %s
+            AND status = 'F' AND MONTH(data_aula) = MONTH(%s)) as faltas_mes
         FROM portal_aluno_turma at2
         JOIN portal_alunos a ON a.id = at2.aluno_id
-        WHERE at2.turma_id = %s
+        WHERE at2.turma_id = %s AND (a.ativo = 1 OR a.ativo IS NULL)
         ORDER BY a.nome
     """, (turma_id, data, turma_id, data, turma_id))
     alunos = cur.fetchall()
