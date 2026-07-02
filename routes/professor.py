@@ -932,11 +932,11 @@ def alunos_desativados():
     return render_template('professor/gerenciamento/alunos_desativados.html', alunos=alunos)
 
 
-
 @professor_bp.route('/notificacoes')
 @login_required
 def notificacoes():
     professor_id = session['id']
+    cargo = session.get('cargo', '').lower()
     hoje = date.today()
 
     conn = create_connection()
@@ -944,7 +944,8 @@ def notificacoes():
 
     # Alunos com 3+ faltas no mês nas turmas do professor
     cur.execute("""
-        SELECT a.nome, COUNT(*) as total_faltas, t.nome as turma
+        SELECT a.nome, COUNT(*) as total_faltas, t.nome as turma,
+               MAX(DATE_FORMAT(c.data_aula, '%d/%m')) as ultima_falta
         FROM portal_chamadas c
         JOIN portal_alunos a ON a.id = c.aluno_id
         JOIN portal_turmas t ON t.id = c.turma_id
@@ -960,27 +961,49 @@ def notificacoes():
 
     # Turmas sem chamada hoje
     cur.execute("""
-        SELECT a.nome, COUNT(*) as total_faltas, t.nome as turma,
-            MAX(DATE_FORMAT(c.data_aula, '%d/%m')) as ultima_falta
-        FROM portal_chamadas c
-        JOIN portal_alunos a ON a.id = c.aluno_id
-        JOIN portal_turmas t ON t.id = c.turma_id
+        SELECT DISTINCT t.nome as turma
+        FROM portal_turmas t
         JOIN portal_turma_professores tp ON tp.turma_id = t.id
-        WHERE tp.professor_id = %s AND c.status = 'F'
-        AND MONTH(c.data_aula) = MONTH(NOW())
-        AND YEAR(c.data_aula) = YEAR(NOW())
-        GROUP BY a.id, a.nome, t.nome
-        HAVING COUNT(*) >= 3
-        LIMIT 5
-    """, (professor_id,))
+        WHERE tp.professor_id = %s
+        AND t.id NOT IN (
+            SELECT DISTINCT turma_id FROM portal_chamadas
+            WHERE DATE(data_aula) = %s
+        )
+    """, (professor_id, hoje))
     sem_chamada = cur.fetchall()
+
+    # Notificações extras para admin
+    novos_alunos = []
+    alunos_desativados = []
+
+    if cargo == 'admin':
+        # Novos alunos cadastrados nos últimos 7 dias
+        cur.execute("""
+            SELECT nome, matricula, DATE_FORMAT(criado_em, '%d/%m') as data
+            FROM portal_alunos
+            WHERE criado_em >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+            AND (ativo = 1 OR ativo IS NULL)
+            ORDER BY criado_em DESC
+            LIMIT 5
+        """)
+        novos_alunos = cur.fetchall()
+
+        # Alunos desativados
+        cur.execute("""
+            SELECT COUNT(*) as total FROM portal_alunos WHERE ativo = 0
+        """)
+        resultado = cur.fetchone()
+        if resultado['total'] > 0:
+            alunos_desativados = [{'total': resultado['total']}]
 
     cur.close()
     conn.close()
 
-    total = len(faltas) + len(sem_chamada)
+    total = len(faltas) + len(sem_chamada) + len(novos_alunos) + len(alunos_desativados)
     return jsonify({
         'total': total,
         'faltas': [dict(f) for f in faltas],
-        'sem_chamada': [dict(s) for s in sem_chamada]
+        'sem_chamada': [dict(s) for s in sem_chamada],
+        'novos_alunos': [dict(a) for a in novos_alunos],
+        'alunos_desativados': [dict(a) for a in alunos_desativados]
     })

@@ -111,6 +111,7 @@ function toggleSinoProfessor() {
   }
 }
 
+
 function carregarNotificacoesProfessor() {
   fetch('/professor/notificacoes')
     .then(r => r.json())
@@ -143,6 +144,27 @@ function carregarNotificacoesProfessor() {
           </div>
         </div>`;
       });
+
+      if (data.novos_alunos && data.novos_alunos.length > 0) {
+        data.novos_alunos.forEach(a => {
+          html += `<div class="sino-item">
+            <span class="sino-item-icone">🎓</span>
+            <div class="sino-item-texto">
+              Novo aluno: <strong>${a.nome}</strong> — Mat. ${a.matricula}
+              <div class="sino-item-data">Cadastrado em ${a.data}</div>
+            </div>
+          </div>`;
+        });
+      }
+
+      if (data.alunos_desativados && data.alunos_desativados.length > 0) {
+        html += `<div class="sino-item">
+          <span class="sino-item-icone">🔒</span>
+          <div class="sino-item-texto">
+            <strong>${data.alunos_desativados[0].total}</strong> aluno(s) desativado(s)
+          </div>
+        </div>`;
+      }
 
       conteudo.innerHTML = html || '<p class="sino-vazio">Nenhuma notificação.</p>';
     });
