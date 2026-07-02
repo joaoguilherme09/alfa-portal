@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, session, redirect, url_for
+from flask import Blueprint, render_template, session, redirect, url_for, jsonify
 from db import create_connection, get_cursor
 
 aluno_bp = Blueprint('aluno', __name__, url_prefix='/aluno')
