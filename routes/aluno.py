@@ -163,3 +163,56 @@ def comentarios():
     conn.close()
 
     return render_template('aluno/comentarios.html', comunicados=comunicados)
+
+
+@aluno_bp.route('/notificacoes')
+@login_required
+def notificacoes():
+    aluno_id = session['id']
+    conn = create_connection()
+    cur  = get_cursor(conn)
+
+    # Notas dos últimos 7 dias
+    cur.execute("""
+        SELECT nome_atividade, valor, DATE_FORMAT(criado_em, '%d/%m') as data
+        FROM portal_notas
+        WHERE aluno_id = %s AND criado_em >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+        ORDER BY criado_em DESC
+        LIMIT 3
+    """, (aluno_id,))
+    notas = cur.fetchall()
+
+    # Faltas dos últimos 7 dias
+    cur.execute("""
+        SELECT DATE_FORMAT(data_aula, '%d/%m') as data, t.nome as turma
+        FROM portal_chamadas c
+        JOIN portal_turmas t ON t.id = c.turma_id
+        WHERE c.aluno_id = %s AND c.status = 'F'
+        AND data_aula >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+        ORDER BY data_aula DESC
+        LIMIT 3
+    """, (aluno_id,))
+    faltas = cur.fetchall()
+
+    # Comunicados dos últimos 7 dias
+    cur.execute("""
+        SELECT titulo, DATE_FORMAT(criado_em, '%d/%m') as data
+        FROM portal_comunicados
+        WHERE (tipo = 'aluno' AND aluno_id = %s)
+        OR tipo = 'turma'
+        AND criado_em >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+        ORDER BY criado_em DESC
+        LIMIT 3
+    """, (aluno_id,))
+    comunicados = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    total = len(notas) + len(faltas) + len(comunicados)
+    return jsonify({
+        'total': total,
+        'notas': notas,
+        'faltas': faltas,
+        'comunicados': comunicados
+    })
