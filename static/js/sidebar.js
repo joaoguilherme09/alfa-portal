@@ -7,20 +7,26 @@ function toggleSidebar() {
   overlay.classList.toggle('visivel');
 }
 
+
+let notificacoesCarregadas = false;
+
 function toggleSino() {
   const dropdown = document.getElementById('sino-dropdown');
   const badge = document.getElementById('sino-badge');
-  
+
   if (dropdown.classList.contains('oculto')) {
     dropdown.classList.remove('oculto');
-    carregarNotificacoes();
+    if (!notificacoesCarregadas) {
+      carregarNotificacoes();
+      notificacoesCarregadas = true;
+    }
   } else {
     dropdown.classList.add('oculto');
-    // Zera o badge ao fechar
     if (badge) {
       badge.style.display = 'none';
       badge.textContent = '0';
     }
+    notificacoesCarregadas = false;
   }
 }
 
