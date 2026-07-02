@@ -179,7 +179,7 @@ def notificacoes():
 
     # Notas dos últimos 7 dias
     cur.execute("""
-        SELECT nome_atividade, valor, DATE_FORMAT(criado_em, '%%d/%%m') as data
+        SELECT nome_atividade, valor, DATE_FORMAT(criado_em, '%d/%m') as data
         FROM portal_notas
         WHERE aluno_id = %s AND criado_em >= DATE_SUB(NOW(), INTERVAL 7 DAY)
         ORDER BY criado_em DESC LIMIT 3
