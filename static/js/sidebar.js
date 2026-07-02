@@ -7,12 +7,20 @@ function toggleSidebar() {
   overlay.classList.toggle('visivel');
 }
 
-
 function toggleSino() {
   const dropdown = document.getElementById('sino-dropdown');
-  dropdown.classList.toggle('oculto');
-  if (!dropdown.classList.contains('oculto')) {
+  const badge = document.getElementById('sino-badge');
+  
+  if (dropdown.classList.contains('oculto')) {
+    dropdown.classList.remove('oculto');
     carregarNotificacoes();
+  } else {
+    dropdown.classList.add('oculto');
+    // Zera o badge ao fechar
+    if (badge) {
+      badge.style.display = 'none';
+      badge.textContent = '0';
+    }
   }
 }
 
@@ -26,8 +34,6 @@ function carregarNotificacoes() {
       if (data.total > 0) {
         badge.style.display = 'flex';
         badge.textContent = data.total;
-      } else {
-        badge.style.display = 'none';
       }
 
       let html = '';
@@ -71,20 +77,5 @@ document.addEventListener('click', function(e) {
   const wrapper = document.getElementById('sino-wrapper');
   if (wrapper && !wrapper.contains(e.target)) {
     document.getElementById('sino-dropdown')?.classList.add('oculto');
-  }
-});
-
-// Carregar badge ao abrir a página
-document.addEventListener('DOMContentLoaded', function() {
-  if (document.getElementById('sino-badge')) {
-    fetch('/aluno/notificacoes')
-      .then(r => r.json())
-      .then(data => {
-        if (data.total > 0) {
-          const badge = document.getElementById('sino-badge');
-          badge.style.display = 'flex';
-          badge.textContent = data.total;
-        }
-      });
   }
 });
