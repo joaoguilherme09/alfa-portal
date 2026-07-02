@@ -130,6 +130,7 @@ function carregarNotificacoesProfessor() {
           <span class="sino-item-icone">⚠️</span>
           <div class="sino-item-texto">
             <strong>${f.nome}</strong> tem ${f.total_faltas} faltas em ${f.turma}
+            <div class="sino-item-data">Última falta: ${f.ultima_falta}</div>
           </div>
         </div>`;
       });

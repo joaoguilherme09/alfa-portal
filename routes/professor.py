@@ -960,15 +960,19 @@ def notificacoes():
 
     # Turmas sem chamada hoje
     cur.execute("""
-        SELECT DISTINCT t.nome as turma
-        FROM portal_turmas t
+        SELECT a.nome, COUNT(*) as total_faltas, t.nome as turma,
+            MAX(DATE_FORMAT(c.data_aula, '%d/%m')) as ultima_falta
+        FROM portal_chamadas c
+        JOIN portal_alunos a ON a.id = c.aluno_id
+        JOIN portal_turmas t ON t.id = c.turma_id
         JOIN portal_turma_professores tp ON tp.turma_id = t.id
-        WHERE tp.professor_id = %s
-        AND t.id NOT IN (
-            SELECT DISTINCT turma_id FROM portal_chamadas
-            WHERE DATE(data_aula) = %s
-        )
-    """, (professor_id, hoje))
+        WHERE tp.professor_id = %s AND c.status = 'F'
+        AND MONTH(c.data_aula) = MONTH(NOW())
+        AND YEAR(c.data_aula) = YEAR(NOW())
+        GROUP BY a.id, a.nome, t.nome
+        HAVING COUNT(*) >= 3
+        LIMIT 5
+    """, (professor_id,))
     sem_chamada = cur.fetchall()
 
     cur.close()
