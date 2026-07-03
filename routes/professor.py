@@ -561,7 +561,11 @@ def salvar_matricula():
         'valor_desconto':          valor_desconto,
     }
  
-    doc.render(contexto)
+    try:
+        doc.render(contexto)
+    except Exception as e:
+        print(f"ERRO DOCXTPL: {e}")
+        return f"Erro ao gerar contrato: {str(e)}", 500
  
     os.makedirs('uploads/contratos', exist_ok=True)
     nome_arquivo  = f"contrato_{numero_contrato}_{aluno_id}.docx"
