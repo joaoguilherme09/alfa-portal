@@ -12,10 +12,10 @@ function mascaraCPF(input) {
 }
 
 function mascaraRG(input) {
-  let v = input.value.replace(/\D/g, '').slice(0, 9);
+  let v = input.value.toUpperCase().replace(/[^0-9X]/g, '').slice(0, 9);
   v = v.replace(/(\d{2})(\d)/, '$1.$2');
   v = v.replace(/(\d{3})(\d)/, '$1.$2');
-  v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+  v = v.replace(/(\d{3})([\dX]{1,2})$/, '$1-$2');
   input.value = v;
 }
 
@@ -79,5 +79,27 @@ document.addEventListener('DOMContentLoaded', function () {
       el.addEventListener('change', () => validarDataNascimento(el));
     }
   });
+
+  // CEP — preenchimento automático via ViaCEP
+  const cep = document.getElementById('input-cep') || document.querySelector('[name="cep"]');
+  if (cep) {
+    cep.addEventListener('blur', function() {
+      const valor = cep.value.replace(/\D/g, '');
+      if (valor.length === 8) {
+        fetch(`https://viacep.com.br/ws/${valor}/json/`)
+          .then(r => r.json())
+          .then(data => {
+            if (!data.erro) {
+              const endereco = document.getElementById('input-endereco') || document.querySelector('[name="endereco"]');
+              const bairro   = document.getElementById('input-bairro')   || document.querySelector('[name="bairro"]');
+              const cidade   = document.getElementById('input-cidade')   || document.querySelector('[name="cidade"]');
+              if (endereco) endereco.value = data.logradouro || '';
+              if (bairro)   bairro.value   = data.bairro     || '';
+              if (cidade)   cidade.value   = data.localidade  || '';
+            }
+          });
+      }
+    });
+  }
 
 });
