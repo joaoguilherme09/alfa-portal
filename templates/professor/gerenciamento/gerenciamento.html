@@ -654,8 +654,18 @@
       </div>
 
       <div class="campo-grupo">
+        <label class="campo-label">Taxa de matrícula</label>
+        <input type="text" class="campo-input" name="taxa_matricula" placeholder="Ex: R$ 90,00" required/>
+      </div>
+
+      <div class="campo-grupo">
         <label class="campo-label">Data do 1º pagamento</label>
         <input type="date" class="campo-input" name="data_primeiro_pagamento" required/>
+      </div>
+
+      <div class="campo-grupo">
+        <label class="campo-label">Dia de pagamento mensal</label>
+        <input type="number" class="campo-input" name="dia_pagamento" placeholder="Ex: 10" min="1" max="31" required/>
       </div>
 
       <div class="campo-grupo">
@@ -687,6 +697,11 @@
           <label class="campo-label">Valor da parcela</label>
           <input type="text" class="campo-input" name="valor_parcela" placeholder="Ex: R$ 100,00" required/>
         </div>
+      </div>
+
+      <div class="campo-grupo">
+        <label class="campo-label">Valor do desconto</label>
+        <input type="text" class="campo-input" name="valor_desconto" placeholder="Ex: R$ 20,00" required/>
       </div>
 
     </div>

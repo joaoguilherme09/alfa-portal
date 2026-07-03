@@ -490,6 +490,9 @@ def salvar_matricula():
     turma = cur.fetchone()
  
     numero_contrato = f.get('numero_contrato')
+    taxa_matricula  = f.get('taxa_matricula', '')
+    dia_pagamento = f.get('dia_pagamento', '')
+    valor_desconto  = f.get('valor_desconto', '')
     if not numero_contrato:
         cur.execute("SELECT MAX(numero_contrato) as max_num FROM portal_matriculas_contratos")
         resultado = cur.fetchone()
@@ -527,7 +530,7 @@ def salvar_matricula():
             return f"{partes[2]}/{partes[1]}/{partes[0]}"
         return str(d)
  
-    modelo_path = os.path.join('contrato', 'modelo-contrato.docx')
+    modelo_path = os.path.join('contrato', 'modelo-contrato-final.docx')
     doc = DocxTemplate(modelo_path)
  
     contexto = {
@@ -553,6 +556,9 @@ def salvar_matricula():
         'parcelas_extenso':        parcelas_extenso,
         'valor_parcela':           f['valor_parcela'],
         'dia_horario':             dia_horario,
+        'taxa_matricula':          taxa_matricula,
+        'dia_pagamento':           dia_pagamento,
+        'valor_desconto':          valor_desconto,
     }
  
     doc.render(contexto)
