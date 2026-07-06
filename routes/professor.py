@@ -444,14 +444,22 @@ def salvar_aluno():
             matricula, senha, periodo, foto
         ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
     """, (
-        criptografar(f['nome_responsavel']), f['nascimento_responsavel'],
-        criptografar(f['cpf_responsavel']), criptografar(f['rg_responsavel']),
-        criptografar(f['telefone_responsavel']),
-        f['nome'], f['nascimento'],
-        criptografar(f['endereco']), criptografar(f['bairro']),
-        criptografar(f['numero']), criptografar(f['cidade']),
-        criptografar(f['cep']),
-        nova_matricula, hash_senha(f['senha']), f['periodo'], foto
+        criptografar(f.get('nome_responsavel') or ''),
+        f.get('nascimento_responsavel') or None,
+        criptografar(f.get('cpf_responsavel') or ''),
+        criptografar(f.get('rg_responsavel') or ''),
+        criptografar(f.get('telefone_responsavel') or ''),
+        f.get('nome') or '',
+        f.get('nascimento') or None,
+        criptografar(f.get('endereco') or ''),
+        criptografar(f.get('bairro') or ''),
+        criptografar(f.get('numero') or ''),
+        criptografar(f.get('cidade') or ''),
+        criptografar(f.get('cep') or ''),
+        nova_matricula,
+        hash_senha(f.get('senha') or '123'),
+        f.get('periodo') or 'Manhã',
+        foto
     ))
     aluno_id = cur.lastrowid
  
