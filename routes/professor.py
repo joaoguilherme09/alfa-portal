@@ -221,7 +221,14 @@ def gerenciamento():
     cur.execute("""
         SELECT a.id, a.nome, a.matricula, a.foto, a.periodo,
             GROUP_CONCAT(DISTINCT c.nome SEPARATOR ' , ') as curso,
-            GROUP_CONCAT(DISTINCT t.dias_semana SEPARATOR ',') as dias_semana
+            GROUP_CONCAT(DISTINCT t.dias_semana SEPARATOR ',') as dias_semana,
+            CASE WHEN (
+                a.nascimento IS NULL OR a.nascimento_responsavel IS NULL OR
+                a.nome_responsavel = '' OR a.cpf_responsavel = '' OR
+                a.rg_responsavel = '' OR a.telefone_responsavel = '' OR
+                a.endereco = '' OR a.bairro = '' OR a.numero = '' OR
+                a.cidade = '' OR a.cep = ''
+            ) THEN 1 ELSE 0 END as dados_incompletos
         FROM portal_alunos a
         LEFT JOIN portal_aluno_turma at2 ON at2.aluno_id = a.id
         LEFT JOIN portal_turmas t ON t.id = at2.turma_id
@@ -436,37 +443,43 @@ def salvar_aluno():
     else:
         nova_matricula = str((resultado['max_mat'] or 50240000) + 1)
  
-    cur.execute("""
-        INSERT INTO portal_alunos (
-            nome_responsavel, nascimento_responsavel, cpf_responsavel,
-            rg_responsavel, telefone_responsavel,
-            nome, nascimento, endereco, bairro, numero, cidade, cep,
-            matricula, senha, periodo, foto
-        ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-    """, (
-        criptografar(f.get('nome_responsavel') or ''),
-        f.get('nascimento_responsavel') or None,
-        criptografar(f.get('cpf_responsavel') or ''),
-        criptografar(f.get('rg_responsavel') or ''),
-        criptografar(f.get('telefone_responsavel') or ''),
-        f.get('nome') or '',
-        f.get('nascimento') or None,
-        criptografar(f.get('endereco') or ''),
-        criptografar(f.get('bairro') or ''),
-        criptografar(f.get('numero') or ''),
-        criptografar(f.get('cidade') or ''),
-        criptografar(f.get('cep') or ''),
-        nova_matricula,
-        hash_senha(f.get('senha') or '123'),
-        f.get('periodo') or 'Manhã',
-        foto
-    ))
-    aluno_id = cur.lastrowid
- 
-    for turma_id in turmas:
-        cur.execute("INSERT INTO portal_aluno_turma (aluno_id, turma_id) VALUES (%s,%s)", (aluno_id, turma_id))
- 
-    conn.commit()
+    try:
+        cur.execute("""
+            INSERT INTO portal_alunos (
+                nome_responsavel, nascimento_responsavel, cpf_responsavel,
+                rg_responsavel, telefone_responsavel,
+                nome, nascimento, endereco, bairro, numero, cidade, cep,
+                matricula, senha, periodo, foto
+            ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+        """, (
+            criptografar(f.get('nome_responsavel') or ''),
+            f.get('nascimento_responsavel') or None,
+            criptografar(f.get('cpf_responsavel') or ''),
+            criptografar(f.get('rg_responsavel') or ''),
+            criptografar(f.get('telefone_responsavel') or ''),
+            f.get('nome') or '',
+            f.get('nascimento') or None,
+            criptografar(f.get('endereco') or ''),
+            criptografar(f.get('bairro') or ''),
+            criptografar(f.get('numero') or ''),
+            criptografar(f.get('cidade') or ''),
+            criptografar(f.get('cep') or ''),
+            nova_matricula,
+            hash_senha(f.get('senha') or '123'),
+            f.get('periodo') or 'Manhã',
+            foto
+        ))
+        aluno_id = cur.lastrowid
+        for turma_id in turmas:
+            cur.execute("INSERT INTO portal_aluno_turma (aluno_id, turma_id) VALUES (%s,%s)", (aluno_id, turma_id))
+        conn.commit()
+    except Exception as e:
+        cur.close()
+        conn.close()
+        if '1062' in str(e):
+            return "<script>alert('Matrícula já cadastrada! Use outra matrícula.'); history.back();</script>"
+        return f"Erro: {str(e)}", 500
+
     cur.close()
     conn.close()
     return redirect(url_for('professor.gerenciamento'))
