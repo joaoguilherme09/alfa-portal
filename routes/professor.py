@@ -642,13 +642,13 @@ def buscar_aluno(aluno_id):
         return jsonify(aluno)
     return jsonify({'erro': 'Aluno não encontrado'}), 404
  
- 
-@professor_bp.route('/editar_aluno', methods=['POST'])
+ @professor_bp.route('/editar_aluno', methods=['POST'])
 @login_required
 def editar_aluno():
     f        = flask_request.form
     aluno_id = f['aluno_id']
     foto     = salvar_foto(flask_request.files.get('foto'))
+    matricula = f.get('matricula') or ''
 
     conn = create_connection()
     cur  = get_cursor(conn)
@@ -666,7 +666,8 @@ def editar_aluno():
         criptografar(f.get('numero') or ''),
         criptografar(f.get('cidade') or ''),
         criptografar(f.get('cep') or ''),
-        f.get('periodo') or 'Manhã'
+        f.get('periodo') or 'Manhã',
+        matricula
     )
 
     if f.get('senha') and foto:
@@ -675,7 +676,7 @@ def editar_aluno():
                 nome_responsavel=%s, nascimento_responsavel=%s, cpf_responsavel=%s,
                 rg_responsavel=%s, telefone_responsavel=%s, nome=%s, nascimento=%s,
                 endereco=%s, bairro=%s, numero=%s, cidade=%s, cep=%s, periodo=%s,
-                senha=%s, foto=%s WHERE id=%s
+                matricula=%s, senha=%s, foto=%s WHERE id=%s
         """, (*campos_base, hash_senha(f['senha']), foto, aluno_id))
     elif f.get('senha'):
         cur.execute("""
@@ -683,7 +684,7 @@ def editar_aluno():
                 nome_responsavel=%s, nascimento_responsavel=%s, cpf_responsavel=%s,
                 rg_responsavel=%s, telefone_responsavel=%s, nome=%s, nascimento=%s,
                 endereco=%s, bairro=%s, numero=%s, cidade=%s, cep=%s, periodo=%s,
-                senha=%s WHERE id=%s
+                matricula=%s, senha=%s WHERE id=%s
         """, (*campos_base, hash_senha(f['senha']), aluno_id))
     elif foto:
         cur.execute("""
@@ -691,22 +692,22 @@ def editar_aluno():
                 nome_responsavel=%s, nascimento_responsavel=%s, cpf_responsavel=%s,
                 rg_responsavel=%s, telefone_responsavel=%s, nome=%s, nascimento=%s,
                 endereco=%s, bairro=%s, numero=%s, cidade=%s, cep=%s, periodo=%s,
-                foto=%s WHERE id=%s
+                matricula=%s, foto=%s WHERE id=%s
         """, (*campos_base, foto, aluno_id))
     else:
         cur.execute("""
             UPDATE portal_alunos SET
                 nome_responsavel=%s, nascimento_responsavel=%s, cpf_responsavel=%s,
                 rg_responsavel=%s, telefone_responsavel=%s, nome=%s, nascimento=%s,
-                endereco=%s, bairro=%s, numero=%s, cidade=%s, cep=%s, periodo=%s
-                WHERE id=%s
+                endereco=%s, bairro=%s, numero=%s, cidade=%s, cep=%s, periodo=%s,
+                matricula=%s WHERE id=%s
         """, (*campos_base, aluno_id))
 
     conn.commit()
     cur.close()
     conn.close()
     return redirect(url_for('professor.gerenciamento'))
- 
+
 
  
 @professor_bp.route('/editar_professor', methods=['POST'])

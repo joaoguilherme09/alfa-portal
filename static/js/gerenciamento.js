@@ -57,6 +57,7 @@ function abrirModalEditar(alunoId) {
       document.getElementById('edit-cep').value                  = a.cep;
       document.getElementById('edit-senha').value                = a.senha;
       document.getElementById('edit-periodo').value              = a.periodo;
+      document.getElementById('edit-matricula').value = a.matricula;
 
       // Marcar turmas
       document.querySelectorAll('.edit-turma-check').forEach(cb => {
