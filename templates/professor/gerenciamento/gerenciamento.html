@@ -471,18 +471,7 @@
         </div>
       </div>
  
-      <p class="secao-grupo">Dados Acadêmicos</p>
-      <div class="campo-grupo">
-        <label class="campo-label">Turmas</label>
-        <div class="turmas-check" id="turmas-check-cadastro">
-          {% for turma in turmas %}
-          <label class="turma-check-item">
-            <input type="checkbox" name="turmas[]" value="{{ turma.id }}"/>
-            {{ turma.curso }} — {{ turma.nome }}
-          </label>
-          {% endfor %}
-        </div>
-      </div>
+      <p class="secao-grupo">Dados Acadêmicos</p>      
       <div class="campo-grupo">
         <label class="campo-label">Período</label>
         <select class="campo-select" name="periodo" required>

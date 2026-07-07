@@ -24,7 +24,10 @@
     <h3 class="secao-titulo">
       {{ turma.curso }} — {{ turma.turma }}
     </h3>
-    <span class="badge-alunos">{{ alunos|length }} aluno{% if alunos|length != 1 %}s{% endif %}</span>
+    <div style="display:flex; gap:10px; align-items:center;">
+      <span class="badge-alunos">{{ alunos|length }} aluno{% if alunos|length != 1 %}s{% endif %}</span>
+      <button class="btn-cadastrar" onclick="abrirModalVincular()">+ Adicionar Aluno</button>
+    </div>
   </div>
 
   <div class="lista-ger">
@@ -32,7 +35,11 @@
       {% for aluno in alunos %}
       <div class="card-ger">
         <div class="card-ger-esquerda">
+          {% if aluno.foto %}
+          <img src="{{ aluno.foto }}" class="aluno-avatar-foto"/>
+          {% else %}
           <div class="aluno-avatar">{{ aluno.nome[0] }}</div>
+          {% endif %}
           <div class="card-ger-info">
             <p class="card-ger-titulo">{{ aluno.nome }}</p>
             <p class="card-ger-sub">
@@ -44,6 +51,7 @@
           {% if aluno.faltas_mes > 0 %}
           <span class="badge-faltas">{{ aluno.faltas_mes }} falta{% if aluno.faltas_mes != 1 %}s{% endif %} no mês</span>
           {% endif %}
+          <button class="btn-acao desativar" onclick="confirmarRemover({{ aluno.id }}, '{{ aluno.nome }}', {{ turma_id }})">Remover</button>
         </div>
       </div>
       {% endfor %}
@@ -54,4 +62,99 @@
 
 </div>
 
+<!-- ===== MODAL VINCULAR ALUNO ===== -->
+<div class="modal-overlay oculto" id="overlay-modal-vincular" onclick="fecharModalVincular()"></div>
+<div class="modal oculto" id="modal-vincular">
+  <div class="modal-header">
+    <h3>Adicionar Aluno à Turma</h3>
+    <button class="modal-fechar" onclick="fecharModalVincular()">✕</button>
+  </div>
+  <div class="modal-corpo">
+    <input type="text" id="busca-aluno-vincular" class="campo-input" placeholder="Buscar por nome ou matrícula..." oninput="filtrarAlunos()"/>
+    <div class="turmas-check" id="lista-alunos-vincular" style="margin-top:12px; max-height:300px;">
+      <p style="color:#94a3b8; font-size:0.85rem;">Carregando...</p>
+    </div>
+  </div>
+  <div class="modal-rodape">
+    <button type="button" class="btn-cancelar" onclick="fecharModalVincular()">Cancelar</button>
+    <button type="button" class="btn-enviar" onclick="vincularAlunos()">Adicionar</button>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script>
+const TURMA_ID = {{ turma_id }};
+let todosAlunos = [];
+
+function abrirModalVincular() {
+  document.getElementById('overlay-modal-vincular').classList.remove('oculto');
+  document.getElementById('modal-vincular').classList.remove('oculto');
+  carregarAlunos();
+}
+
+function fecharModalVincular() {
+  document.getElementById('overlay-modal-vincular').classList.add('oculto');
+  document.getElementById('modal-vincular').classList.add('oculto');
+}
+
+function carregarAlunos() {
+  fetch(`/professor/alunos_sem_turma/${TURMA_ID}`)
+    .then(r => r.json())
+    .then(data => {
+      todosAlunos = data;
+      renderizarAlunos(data);
+    });
+}
+
+function renderizarAlunos(alunos) {
+  const lista = document.getElementById('lista-alunos-vincular');
+  if (alunos.length === 0) {
+    lista.innerHTML = '<p style="color:#94a3b8; font-size:0.85rem;">Nenhum aluno disponível.</p>';
+    return;
+  }
+  lista.innerHTML = alunos.map(a => `
+    <label class="turma-check-item">
+      <input type="checkbox" value="${a.id}" class="check-vincular"/>
+      ${a.nome} — Mat. ${a.matricula}
+    </label>
+  `).join('');
+}
+
+function filtrarAlunos() {
+  const busca = document.getElementById('busca-aluno-vincular').value.toLowerCase();
+  const filtrados = todosAlunos.filter(a =>
+    a.nome.toLowerCase().includes(busca) || a.matricula.toLowerCase().includes(busca)
+  );
+  renderizarAlunos(filtrados);
+}
+
+function vincularAlunos() {
+  const selecionados = [...document.querySelectorAll('.check-vincular:checked')].map(c => c.value);
+  if (selecionados.length === 0) {
+    alert('Selecione ao menos um aluno!');
+    return;
+  }
+  fetch(`/professor/vincular_alunos/${TURMA_ID}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ aluno_ids: selecionados })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.ok) location.reload();
+  });
+}
+
+function confirmarRemover(alunoId, nomeAluno, turmaId) {
+  if (confirm(`Remover "${nomeAluno}" desta turma?`)) {
+    fetch(`/professor/remover_aluno_turma/${turmaId}/${alunoId}`, { method: 'POST' })
+      .then(r => r.json())
+      .then(data => {
+        if (data.ok) location.reload();
+      });
+  }
+}
+</script>
 {% endblock %}

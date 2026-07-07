@@ -1025,3 +1025,49 @@ def notificacoes():
         'novos_alunos': [dict(a) for a in novos_alunos],
         'alunos_desativados': [dict(a) for a in alunos_desativados]
     })
+
+@professor_bp.route('/alunos_sem_turma/<int:turma_id>')
+@admin_required
+def alunos_sem_turma(turma_id):
+    conn = create_connection()
+    cur  = get_cursor(conn)
+    cur.execute("""
+        SELECT id, nome, matricula FROM portal_alunos
+        WHERE (ativo = 1 OR ativo IS NULL)
+        AND id NOT IN (
+            SELECT aluno_id FROM portal_aluno_turma WHERE turma_id = %s
+        )
+        ORDER BY nome
+    """, (turma_id,))
+    alunos = cur.fetchall()
+    cur.close()
+    conn.close()
+    return jsonify(alunos)
+
+@professor_bp.route('/vincular_alunos/<int:turma_id>', methods=['POST'])
+@admin_required
+def vincular_alunos(turma_id):
+    data = flask_request.get_json()
+    aluno_ids = data.get('aluno_ids', [])
+    conn = create_connection()
+    cur  = get_cursor(conn)
+    for aluno_id in aluno_ids:
+        cur.execute("""
+            INSERT IGNORE INTO portal_aluno_turma (aluno_id, turma_id)
+            VALUES (%s, %s)
+        """, (aluno_id, turma_id))
+    conn.commit()
+    cur.close()
+    conn.close()
+    return jsonify({'ok': True})
+
+@professor_bp.route('/remover_aluno_turma/<int:turma_id>/<int:aluno_id>', methods=['POST'])
+@admin_required
+def remover_aluno_turma(turma_id, aluno_id):
+    conn = create_connection()
+    cur  = get_cursor(conn)
+    cur.execute("DELETE FROM portal_aluno_turma WHERE aluno_id = %s AND turma_id = %s", (aluno_id, turma_id))
+    conn.commit()
+    cur.close()
+    conn.close()
+    return jsonify({'ok': True})
