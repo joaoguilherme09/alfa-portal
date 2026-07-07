@@ -643,28 +643,32 @@ def buscar_aluno(aluno_id):
     return jsonify({'erro': 'Aluno não encontrado'}), 404
  
  
- 
 @professor_bp.route('/editar_aluno', methods=['POST'])
 @login_required
 def editar_aluno():
     f        = flask_request.form
     aluno_id = f['aluno_id']
-    turmas   = flask_request.form.getlist('turmas[]')
     foto     = salvar_foto(flask_request.files.get('foto'))
- 
+
     conn = create_connection()
     cur  = get_cursor(conn)
- 
+
     campos_base = (
-        criptografar(f['nome_responsavel']), f['nascimento_responsavel'],
-        criptografar(f['cpf_responsavel']), criptografar(f['rg_responsavel']),
-        criptografar(f['telefone_responsavel']),
-        f['nome'], f['nascimento'],
-        criptografar(f['endereco']), criptografar(f['bairro']),
-        criptografar(f['numero']), criptografar(f['cidade']),
-        criptografar(f['cep']), f['periodo']
+        criptografar(f.get('nome_responsavel') or ''),
+        f.get('nascimento_responsavel') or None,
+        criptografar(f.get('cpf_responsavel') or ''),
+        criptografar(f.get('rg_responsavel') or ''),
+        criptografar(f.get('telefone_responsavel') or ''),
+        f.get('nome') or '',
+        f.get('nascimento') or None,
+        criptografar(f.get('endereco') or ''),
+        criptografar(f.get('bairro') or ''),
+        criptografar(f.get('numero') or ''),
+        criptografar(f.get('cidade') or ''),
+        criptografar(f.get('cep') or ''),
+        f.get('periodo') or 'Manhã'
     )
- 
+
     if f.get('senha') and foto:
         cur.execute("""
             UPDATE portal_alunos SET
@@ -697,11 +701,7 @@ def editar_aluno():
                 endereco=%s, bairro=%s, numero=%s, cidade=%s, cep=%s, periodo=%s
                 WHERE id=%s
         """, (*campos_base, aluno_id))
- 
-    cur.execute("DELETE FROM portal_aluno_turma WHERE aluno_id = %s", (aluno_id,))
-    for turma_id in turmas:
-        cur.execute("INSERT INTO portal_aluno_turma (aluno_id, turma_id) VALUES (%s,%s)", (aluno_id, turma_id))
- 
+
     conn.commit()
     cur.close()
     conn.close()

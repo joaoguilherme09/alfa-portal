@@ -511,8 +511,7 @@
   </form>
 </div>
 
- 
-<!-- ===== MODAL EDITAR ALUNO ===== -->
+ <!-- ===== MODAL EDITAR ALUNO ===== -->
 <div class="modal-overlay oculto" id="overlay-modal-editar-aluno" onclick="fecharModal('modal-editar-aluno')"></div>
 <div class="modal oculto" id="modal-editar-aluno">
   <div class="modal-header">
@@ -522,79 +521,68 @@
   <form action="/professor/editar_aluno" method="POST" enctype="multipart/form-data">
     <input type="hidden" name="aluno_id" id="edit-aluno-id"/>
     <div class="modal-corpo">
- 
+
       <p class="secao-grupo">Dados do Responsável</p>
       <div class="campo-grupo">
         <label class="campo-label">Nome do responsável</label>
-        <input type="text" class="campo-input" name="nome_responsavel" id="edit-nome-responsavel" required/>
+        <input type="text" class="campo-input" name="nome_responsavel" id="edit-nome-responsavel"/>
       </div>
       <div class="campos-linha">
         <div class="campo-grupo">
           <label class="campo-label">Nascimento</label>
-          <input type="date" class="campo-input" name="nascimento_responsavel" id="edit-nasc-responsavel" required/>
+          <input type="date" class="campo-input" name="nascimento_responsavel" id="edit-nasc-responsavel"/>
         </div>
         <div class="campo-grupo">
           <label class="campo-label">CPF</label>
-          <input type="text" class="campo-input" name="cpf_responsavel" id="edit-cpf" maxlength="14" required/>
+          <input type="text" class="campo-input" name="cpf_responsavel" id="edit-cpf" maxlength="14"/>
         </div>
       </div>
       <div class="campos-linha">
         <div class="campo-grupo">
           <label class="campo-label">RG</label>
-          <input type="text" class="campo-input" name="rg_responsavel" id="edit-rg" maxlength="12" required/>
+          <input type="text" class="campo-input" name="rg_responsavel" id="edit-rg" maxlength="12"/>
         </div>
         <div class="campo-grupo">
           <label class="campo-label">Telefone</label>
-          <input type="text" class="campo-input" name="telefone_responsavel" id="edit-telefone" maxlength="15" required/>
+          <input type="text" class="campo-input" name="telefone_responsavel" id="edit-telefone" maxlength="15"/>
         </div>
       </div>
- 
+
       <p class="secao-grupo">Dados do Aluno</p>
       <div class="campo-grupo">
         <label class="campo-label">Nome do aluno</label>
-        <input type="text" class="campo-input" name="nome" id="edit-nome-aluno" required/>
+        <input type="text" class="campo-input" name="nome" id="edit-nome-aluno"/>
       </div>
       <div class="campo-grupo">
         <label class="campo-label">Nascimento</label>
-        <input type="date" class="campo-input" name="nascimento" id="edit-nasc-aluno" required/>
+        <input type="date" class="campo-input" name="nascimento" id="edit-nasc-aluno"/>
       </div>
       <div class="campo-grupo">
         <label class="campo-label">Endereço</label>
-        <input type="text" class="campo-input" name="endereco" id="edit-endereco" required/>
+        <input type="text" class="campo-input" name="endereco" id="edit-endereco"/>
       </div>
       <div class="campos-linha">
         <div class="campo-grupo">
           <label class="campo-label">Número</label>
-          <input type="text" class="campo-input" name="numero" id="edit-numero" required/>
+          <input type="text" class="campo-input" name="numero" id="edit-numero"/>
         </div>
         <div class="campo-grupo">
           <label class="campo-label">Bairro</label>
-          <input type="text" class="campo-input" name="bairro" id="edit-bairro" required/>
+          <input type="text" class="campo-input" name="bairro" id="edit-bairro"/>
         </div>
       </div>
       <div class="campos-linha">
         <div class="campo-grupo">
           <label class="campo-label">Cidade</label>
-          <input type="text" class="campo-input" name="cidade" id="edit-cidade" required/>
+          <input type="text" class="campo-input" name="cidade" id="edit-cidade"/>
         </div>
         <div class="campo-grupo">
           <label class="campo-label">CEP</label>
-          <input type="text" class="campo-input" name="cep" id="edit-cep" required/>
+          <input type="text" class="campo-input" name="cep" id="edit-cep"/>
         </div>
       </div>
- 
+
       <p class="secao-grupo">Dados Acadêmicos</p>
-      <div class="campo-grupo">
-        <label class="campo-label">Turmas</label>
-        <div class="turmas-check" id="turmas-check-edicao">
-          {% for turma in turmas %}
-          <label class="turma-check-item">
-            <input type="checkbox" name="turmas[]" value="{{ turma.id }}" class="edit-turma-check"/>
-            {{ turma.curso }} — {{ turma.nome }}
-          </label>
-          {% endfor %}
-        </div>
-      </div>
       <div class="campo-grupo">
         <label class="campo-label">Período</label>
         <select class="campo-select" name="periodo" id="edit-periodo">
@@ -616,7 +604,7 @@
           <span>Selecionar foto</span>
           <input type="file" name="foto" accept="image/*" style="display:none"/>
         </label>
-      </div> 
+      </div>
     </div>
     <div class="modal-rodape">
       <button type="button" class="btn-cancelar" onclick="fecharModal('modal-editar-aluno')">Cancelar</button>
