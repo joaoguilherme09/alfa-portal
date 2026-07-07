@@ -642,7 +642,7 @@ def buscar_aluno(aluno_id):
         return jsonify(aluno)
     return jsonify({'erro': 'Aluno não encontrado'}), 404
  
- @professor_bp.route('/editar_aluno', methods=['POST'])
+@professor_bp.route('/editar_aluno', methods=['POST'])
 @login_required
 def editar_aluno():
     f        = flask_request.form
