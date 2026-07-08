@@ -88,6 +88,7 @@
         <div class="radio-grupo">
           <label class="radio-opcao"><input type="radio" name="tipo" value="turma" checked onchange="trocarTipo('turma')"/> Para turma</label>
           <label class="radio-opcao"><input type="radio" name="tipo" value="aluno" onchange="trocarTipo('aluno')"/> Para aluno específico</label>
+          <label class="radio-opcao"><input type="radio" name="tipo" value="todos" onchange="trocarTipo('todos')"/> Para todos os alunos</label>
         </div>
       </div>
 
@@ -149,10 +150,24 @@ function fecharModal() {
   document.getElementById('modal-overlay').classList.add('oculto');
   document.getElementById('modal-comunicado').classList.add('oculto');
 }
+
 function trocarTipo(tipo) {
-  const campo = document.getElementById('campo-aluno-com');
-  tipo === 'aluno' ? campo.classList.remove('oculto') : campo.classList.add('oculto');
+  const campoAluno = document.getElementById('campo-aluno-com');
+  const campoTurma = document.getElementById('select-turma-com').parentElement;
+  
+  if (tipo === 'aluno') {
+    campoAluno.classList.remove('oculto');
+    campoTurma.classList.remove('oculto');
+  } else if (tipo === 'turma') {
+    campoAluno.classList.add('oculto');
+    campoTurma.classList.remove('oculto');
+  } else {
+    campoAluno.classList.add('oculto');
+    campoTurma.classList.add('oculto');
+  }
 }
+
+
 function atualizarLabel(input) {
   document.getElementById('upload-label').textContent = input.files[0] ? input.files[0].name : 'Selecionar arquivo';
 }

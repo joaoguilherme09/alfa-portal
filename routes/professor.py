@@ -328,6 +328,8 @@ ALLOWED_EXTENSIONS = {'pdf', 'docx'}
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+
+
 @professor_bp.route('/salvar_comunicado', methods=['POST'])
 @login_required
 def salvar_comunicado():
@@ -339,6 +341,7 @@ def salvar_comunicado():
     aluno_id  = flask_request.form.get('aluno_id') or None
     arquivo   = flask_request.files.get('arquivo')
 
+
     if arquivo and allowed_file(arquivo.filename):
         filename = secure_filename(arquivo.filename)
         os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -346,17 +349,29 @@ def salvar_comunicado():
 
         conn = create_connection()
         cur  = get_cursor(conn)
-        cur.execute("""
-            INSERT INTO portal_comunicados
-            (professor_id, titulo, arquivo, tipo, turma_id, aluno_id)
-            VALUES (%s, %s, %s, %s, %s, %s)
-        """, (professor_id, titulo, filename, tipo, turma_id, aluno_id))
+
+        if tipo == 'todos':
+            # Buscar todos os alunos ativos
+            cur.execute("SELECT id FROM portal_alunos WHERE ativo = 1 OR ativo IS NULL")
+            alunos = cur.fetchall()
+            for a in alunos:
+                cur.execute("""
+                    INSERT INTO portal_comunicados
+                    (professor_id, titulo, arquivo, tipo, turma_id, aluno_id)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                """, (professor_id, titulo, filename, 'aluno', None, a['id']))
+        else:
+            cur.execute("""
+                INSERT INTO portal_comunicados
+                (professor_id, titulo, arquivo, tipo, turma_id, aluno_id)
+                VALUES (%s, %s, %s, %s, %s, %s)
+            """, (professor_id, titulo, filename, tipo, turma_id, aluno_id))
+
         conn.commit()
         cur.close()
         conn.close()
 
     return redirect(url_for('professor.comunicados'))
-
  
  
 @professor_bp.route('/salvar_turma', methods=['POST'])
