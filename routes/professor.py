@@ -1085,3 +1085,29 @@ def remover_aluno_turma(turma_id, aluno_id):
     cur.close()
     conn.close()
     return jsonify({'ok': True})
+
+
+
+
+
+
+@professor_bp.route('/minhas_turmas')
+@login_required
+def minhas_turmas():
+    professor_id = session['id']
+    conn = create_connection()
+    cur  = get_cursor(conn)
+    cur.execute("""
+        SELECT DISTINCT t.id, t.nome, t.dias_semana, t.horario, t.periodo,
+               c.nome as curso,
+               (SELECT COUNT(*) FROM portal_aluno_turma WHERE turma_id = t.id) as total_alunos
+        FROM portal_turmas t
+        JOIN portal_cursos c ON c.id = t.curso_id
+        JOIN portal_turma_professores tp ON tp.turma_id = t.id
+        WHERE tp.professor_id = %s
+        ORDER BY c.nome, t.nome
+    """, (professor_id,))
+    turmas = cur.fetchall()
+    cur.close()
+    conn.close()
+    return render_template('professor/minhas_turmas.html', turmas=turmas)
