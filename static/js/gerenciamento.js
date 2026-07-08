@@ -163,3 +163,34 @@ function limparFiltros() {
     card.style.display = '';
   });
 }
+
+
+// ===== FILTROS DE TURMAS =====
+function filtrarTurmas() {
+  const nome    = document.getElementById('filtro-turma-nome').value.toLowerCase().trim();
+  const curso   = document.getElementById('filtro-turma-curso').value.toLowerCase();
+  const periodo = document.getElementById('filtro-turma-periodo').value.toLowerCase();
+  const dia     = document.getElementById('filtro-turma-dia').value.toLowerCase();
+
+  document.querySelectorAll('#lista-turmas .card-ger').forEach(card => {
+    const titulo = card.querySelector('.card-ger-titulo').textContent.toLowerCase();
+    const sub    = card.querySelector('.card-ger-sub').textContent.toLowerCase();
+
+    const matchNome    = !nome    || titulo.includes(nome) || sub.includes(nome);
+    const matchCurso   = !curso   || sub.includes(curso);
+    const matchPeriodo = !periodo || sub.includes(periodo);
+    const matchDia     = !dia     || sub.includes(dia);
+
+    card.style.display = (matchNome && matchCurso && matchPeriodo && matchDia) ? '' : 'none';
+  });
+}
+
+function limparFiltrosTurmas() {
+  document.getElementById('filtro-turma-nome').value    = '';
+  document.getElementById('filtro-turma-curso').value   = '';
+  document.getElementById('filtro-turma-periodo').value = '';
+  document.getElementById('filtro-turma-dia').value     = '';
+  document.querySelectorAll('#lista-turmas .card-ger').forEach(card => {
+    card.style.display = '';
+  });
+}
