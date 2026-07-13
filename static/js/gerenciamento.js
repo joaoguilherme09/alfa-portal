@@ -55,8 +55,7 @@ function abrirModalEditar(alunoId) {
       document.getElementById('edit-bairro').value               = a.bairro;
       document.getElementById('edit-cidade').value               = a.cidade;
       document.getElementById('edit-cep').value                  = a.cep;
-      document.getElementById('edit-senha').value                = a.senha;
-      document.getElementById('edit-periodo').value              = a.periodo;
+      document.getElementById('edit-senha').value                = a.senha;      
       document.getElementById('edit-matricula').value = a.matricula;
 
       // Marcar turmas
